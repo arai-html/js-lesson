@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第34回｜Gitを使ったバージョン管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 34 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">Git</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">Gitを使ったバージョン管理<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">git init・add・commit・push・branch・merge・GitHub Pages</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>git init/add/commit/pushの基本操作ができ、GitHubにリポジトリをpushしてGitHub Pagesで公開できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">Gitとバージョン管理の概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">Gitの基本コマンドを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">GitHubへのpush・GitHub Pagesで公開</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">Gitでバージョン管理を始めよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">Gitはコードの変更履歴を管理するツールです。いつでも過去の状態に戻れます。エンジニア必須スキルです。</div></div>
+<div class="intro-box">
+<div class="intro-icon">🌿</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">Gitの基本概念</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><strong>リポジトリ</strong>：変更履歴を保存する場所<br><strong>コミット</strong>：変更のスナップショット（セーブポイント）<br><strong>ブランチ</strong>：作業の分岐（メインコードを守りながら機能開発）<br><strong>マージ</strong>：ブランチを合流させる<br><strong>GitHub</strong>：Gitリポジトリをクラウドで管理・公開できるサービス</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">ターミナル（Gitの基本コマンド）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm"># Gitの初期設定（最初の1回だけ）</span>
+git config --global user.name  <span class="cs">"あなたの名前"</span>
+git config --global user.email <span class="cs">"あなたのメール"</span>
+
+<span class="cm"># ① リポジトリを初期化</span>
+git init
+
+<span class="cm"># ② 現在の状態を確認</span>
+git status
+
+<span class="cm"># ③ ファイルをステージング（コミット対象に追加）</span>
+git add index.html        <span class="cm"># 特定のファイル</span>
+git add .                 <span class="cm"># 全ての変更</span>
+
+<span class="cm"># ④ コミット（スナップショットを保存）</span>
+git commit -m <span class="cs">"初回コミット：天気アプリを追加"</span>
+
+<span class="cm"># ⑤ コミット履歴を確認</span>
+git log --oneline
+
+<span class="cm"># ⑥ 変更の差分を確認</span>
+git diff</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">ターミナル（ブランチとマージ）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm"># ブランチの操作</span>
+git branch                    <span class="cm"># ブランチ一覧</span>
+git branch feature/search     <span class="cm"># ブランチを作成</span>
+git checkout feature/search   <span class="cm"># ブランチを切り替え</span>
+git checkout -b feature/sort  <span class="cm"># 作成して切り替え（ショートカット）</span>
+
+<span class="cm"># mainブランチに戻ってマージ</span>
+git checkout main
+git merge feature/search
+
+<span class="cm"># よくある操作のショートカット</span>
+git add . && git commit -m <span class="cs">"メッセージ"</span>  <span class="cm"># add＋commit まとめて</span>
+
+<span class="cm"># .gitignoreでGit管理から除外</span>
+<span class="cm"># .env・node_modules・.DS_Storeなど</span>
+echo <span class="cs">"node_modules"</span> >> .gitignore
+echo <span class="cs">".env"</span>          >> .gitignore</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">コミットメッセージの書き方</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">読んだ人が変更内容を分かる一文</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><strong>良いメッセージ</strong>：<br>✅ <code>「検索機能にdebounceを追加」</code><br>✅ <code>「ToDoの削除ボタンのバグを修正」</code><br>✅ <code>「スマホ対応のレスポンシブCSSを追加」</code><br><br><strong>悪いメッセージ</strong>：<br>❌ <code>「修正」「変更」「update」「fix」</code><br><br>コミット履歴は「開発日誌」です。未来の自分・チームメンバーへのメッセージです。</div>
+</div>
+
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">ファイルをコミット対象に追加するコマンドは？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">git commit</div><div class="quiz-option" onclick="answer(this,true)">git add</div><div class="quiz-option" onclick="answer(this,false)">git push</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">GitHubへpush・GitHub Pagesで公開</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">GitHubにpushしてGitHub Pagesで公開すれば、誰でもアクセスできるURLでポートフォリオを公開できます。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">ターミナル（GitHubへpush）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm"># ① GitHubでリポジトリを新規作成（GitHub.com → New repository）</span>
+
+<span class="cm"># ② リモートリポジトリを登録</span>
+git remote add origin https://github.com/ユーザー名/リポジトリ名.git
+
+<span class="cm"># ③ mainブランチをpush</span>
+git push -u origin main
+
+<span class="cm"># 以降の変更をpushするとき</span>
+git add .
+git commit -m <span class="cs">"変更の説明"</span>
+git push
+
+<span class="cm"># リモートの変更をpull（チーム開発でよく使う）</span>
+git pull origin main
+
+<span class="cm"># よく使うコマンドまとめ</span>
+<span class="cm"># git init          → リポジトリを初期化</span>
+<span class="cm"># git add .         → 全変更をステージング</span>
+<span class="cm"># git commit -m ""  → コミット</span>
+<span class="cm"># git push          → GitHubに送る</span>
+<span class="cm"># git pull          → GitHubから取得</span>
+<span class="cm"># git status        → 現在の状態</span>
+<span class="cm"># git log --oneline → コミット履歴</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">GitHub Pages の設定手順</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">── GitHub Pagesの設定 ──</span>
+<span class="cn">1.</span> GitHubのリポジトリページを開く
+<span class="cn">2.</span> Settings タブをクリック
+<span class="cn">3.</span> 左メニューの Pages をクリック
+<span class="cn">4.</span> Source を <span class="cs">"Deploy from a branch"</span> に設定
+<span class="cn">5.</span> Branch を <span class="cs">"main"</span> / <span class="cs">"/(root)"</span> に設定
+<span class="cn">6.</span> Save をクリック
+<span class="cn">7.</span> 数分後に以下のURLで公開される：
+
+   <span class="cs">https://ユーザー名.github.io/リポジトリ名/</span>
+
+<span class="cm">── 注意点 ──</span>
+<span class="cm">・index.html が root にあること</span>
+<span class="cm">・ファイルパスは相対パスを使う</span>
+<span class="cm">・APIキーをコードに直書きしたままpushしない</span></span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">GitHub Desktopというアプリを使えばGUIでGitの操作ができます。コマンドに慣れていない間はGitHub Desktopでも全く問題ありません。慣れてきたらターミナルコマンドに移行していきましょう。VSCodeには標準でGitの操作パネルも内蔵されています。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">自分のプロジェクト（天気アプリ・ToDoアプリなど）にgit initして、最初のコミットをしよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">GitHubでリポジトリを作り、pushしてGitHub Pagesで公開しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>featureブランチを作って新機能（検索履歴など）を開発し、mainにマージしてpushしよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">git init・add・commit・pushの流れが実行できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">コミットメッセージを具体的に書けた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">GitHubにリポジトリを作ってpushできた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">GitHub PagesでWebページとして公開できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第34回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

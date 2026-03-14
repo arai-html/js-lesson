@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第25回｜実践プロジェクト①：天気アプリ設計</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 25 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">プロジェクト①</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">実践プロジェクト①：天気アプリ設計<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">OpenWeatherMap API・fetchWeather・formatWeather・UI関数設計</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>天気APIのレスポンスを整形し、setLoading/showError/showWeatherのUI関数を分けて設計・実装できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">プロジェクト全体像と設計を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">APIキー取得・HTML/CSSの骨格を作る</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">fetch関数・エラー処理・ローディングを実装</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">天気アプリの設計をしよう</div>
+<div class="sec-time">0〜15分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「第25・26回は実践プロジェクトとして天気アプリを作ります。OpenWeatherMap APIという無料で使えるAPIを使って、都市名を入力すると現在の天気・気温・湿度を表示するアプリです。これまで学んだ fetch・async/await・DOM操作・エラー処理が全部使われます。」</div></div>
+<div class="intro-box">
+<div class="intro-icon">🌤</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">天気アプリの完成イメージ</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><strong>機能</strong>：<br>① 都市名を入力して検索ボタンを押す<br>② OpenWeatherMap APIにfetchでリクエスト<br>③ 天気・気温（摂氏）・湿度・天気アイコンを表示<br>④ ローディング中はスピナー表示<br>⑤ 都市が見つからない・通信エラーのときはエラーメッセージ表示<br>⑥ 最後に検索した都市をlocalStorageに保存して次回復元</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">index.html（HTML骨格）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="ck">&lt;div</span> <span class="fn">class</span>=<span class="cs">"weather-app"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;h1&gt;</span>🌤 天気アプリ<span class="ck">&lt;/h1&gt;</span>
+
+  <span class="cm">&lt;!-- 検索フォーム --&gt;</span>
+  <span class="ck">&lt;div</span> <span class="fn">class</span>=<span class="cs">"search-box"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;input</span> <span class="fn">type</span>=<span class="cs">"text"</span> <span class="fn">id</span>=<span class="cs">"city-input"</span>
+           <span class="fn">placeholder</span>=<span class="cs">"都市名を英語で入力 例: Tokyo"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;button</span> <span class="fn">id</span>=<span class="cs">"search-btn"</span><span class="ck">&gt;</span>検索<span class="ck">&lt;/button&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- ローディング --&gt;</span>
+  <span class="ck">&lt;div</span> <span class="fn">id</span>=<span class="cs">"loading"</span> <span class="fn">class</span>=<span class="cs">"loading"</span> <span class="fn">hidden</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;div</span> <span class="fn">class</span>=<span class="cs">"spinner"</span><span class="ck">&gt;&lt;/div&gt;</span>
+    <span class="ck">&lt;p&gt;</span>取得中...<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- エラーメッセージ --&gt;</span>
+  <span class="ck">&lt;div</span> <span class="fn">id</span>=<span class="cs">"error-msg"</span> <span class="fn">class</span>=<span class="cs">"error"</span> <span class="fn">hidden</span><span class="ck">&gt;&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- 天気表示エリア --&gt;</span>
+  <span class="ck">&lt;div</span> <span class="fn">id</span>=<span class="cs">"weather-result"</span> <span class="fn">hidden</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h2</span> <span class="fn">id</span>=<span class="cs">"city-name"</span><span class="ck">&gt;&lt;/h2&gt;</span>
+    <span class="ck">&lt;img</span>  <span class="fn">id</span>=<span class="cs">"weather-icon"</span> <span class="fn">alt</span>=<span class="cs">"天気アイコン"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;p</span>   <span class="fn">id</span>=<span class="cs">"weather-desc"</span><span class="ck">&gt;&lt;/p&gt;</span>
+    <span class="ck">&lt;div</span> <span class="fn">id</span>=<span class="cs">"weather-details"</span><span class="ck">&gt;&lt;/div&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+<span class="ck">&lt;/div&gt;</span></div>
+</div>
+
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>OpenWeatherMapのAPIキーは事前に取得してもらう。無料プランで十分。取得→サインアップ→API keys→生成→数分〜数時間で有効化される。当日使えない可能性があるのでdummyDataを用意しておく。</div></div>
+<div class="point-card">
+<div class="point-tag">APIキーの取得手順</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">OpenWeatherMap（無料）</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">① https://openweathermap.org/api にアクセス<br>② 「Sign Up」で無料登録<br>③ ログイン後「API keys」タブからキーをコピー<br>④ 有効化まで最大数時間かかる場合がある<br>⑤ 使用するエンドポイント：<code>https://api.openweathermap.org/data/2.5/weather</code></div>
+</div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">API通信関数を実装しよう</div>
+<div class="sec-time">15〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「API通信の関数・UI更新の関数・イベント登録をそれぞれ分けて実装します。責務を分けることでテストしやすく・修正しやすいコードになります。まず今日は関数の骨格とAPI通信部分を完成させます。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（API通信関数）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// APIキー（実際には自分のキーを入れる）</span>
+<span class="kw">const</span> API_KEY  = <span class="cs">"あなたのAPIキー"</span>;
+<span class="kw">const</span> BASE_URL = <span class="cs">"https://api.openweathermap.org/data/2.5/weather"</span>;
+
+<span class="cm">// 天気データを取得する関数</span>
+<span class="kw">const</span> <span class="fn">fetchWeather</span> = <span class="kw">async</span> (city) => {
+  <span class="kw">const</span> url = <span class="cs">`</span><span class="cn">${{BASE_URL}}</span><span class="cs">?q=</span><span class="cn">${{encodeURIComponent(city)}}</span><span class="cs">&units=metric&lang=ja&appid=</span><span class="cn">${{API_KEY}}</span><span class="cs">`</span>;
+
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+
+  <span class="cm">// 404 → 都市が見つからない</span>
+  <span class="kw">if</span> (res.status === <span class="cn">404</span>) {
+    <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="cs">`"</span><span class="cn">${{city}}</span><span class="cs">"は見つかりませんでした。都市名を確認してください。`</span>);
+  }
+  <span class="cm">// 401 → APIキーが不正</span>
+  <span class="kw">if</span> (res.status === <span class="cn">401</span>) {
+    <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="cs">"APIキーが無効です。確認してください。"</span>);
+  }
+  <span class="kw">if</span> (!res.ok) {
+    <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="cs">`通信エラー (</span><span class="cn">${{res.status}}</span><span class="cs">)`</span>);
+  }
+
+  <span class="kw">return</span> <span class="kw">await</span> res.<span class="fn">json</span>();
+};
+
+<span class="cm">// レスポンスから必要なデータを整形する</span>
+<span class="kw">const</span> <span class="fn">formatWeather</span> = (data) => ({
+  city:     data.name,
+  country:  data.sys.country,
+  temp:     <span class="fn">Math</span>.<span class="fn">round</span>(data.main.temp),
+  feelsLike:<span class="fn">Math</span>.<span class="fn">round</span>(data.main.feels_like),
+  humidity: data.main.humidity,
+  desc:     data.weather[<span class="cn">0</span>].description,
+  icon:     <span class="cs">`https://openweathermap.org/img/wn/</span><span class="cn">${{data.weather[0].icon}}</span><span class="cs">@2x.png`</span>,
+  wind:     data.wind.speed,
+});</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（UI更新関数）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// DOM要素を取得</span>
+<span class="kw">const</span> el = {
+  input:    document.<span class="fn">querySelector</span>(<span class="cs">"#city-input"</span>),
+  btn:      document.<span class="fn">querySelector</span>(<span class="cs">"#search-btn"</span>),
+  loading:  document.<span class="fn">querySelector</span>(<span class="cs">"#loading"</span>),
+  error:    document.<span class="fn">querySelector</span>(<span class="cs">"#error-msg"</span>),
+  result:   document.<span class="fn">querySelector</span>(<span class="cs">"#weather-result"</span>),
+  cityName: document.<span class="fn">querySelector</span>(<span class="cs">"#city-name"</span>),
+  icon:     document.<span class="fn">querySelector</span>(<span class="cs">"#weather-icon"</span>),
+  desc:     document.<span class="fn">querySelector</span>(<span class="cs">"#weather-desc"</span>),
+  details:  document.<span class="fn">querySelector</span>(<span class="cs">"#weather-details"</span>),
+};
+
+<span class="cm">// ローディング状態を切り替える</span>
+<span class="kw">const</span> <span class="fn">setLoading</span> = (isLoading) => {
+  el.loading.hidden = !isLoading;
+  el.btn.disabled   =  isLoading;
+  <span class="kw">if</span> (isLoading) {
+    el.error.hidden  = <span class="ck">true</span>;
+    el.result.hidden = <span class="ck">true</span>;
+  }
+};
+
+<span class="cm">// エラーを表示する</span>
+<span class="kw">const</span> <span class="fn">showError</span> = (message) => {
+  el.error.textContent = message;
+  el.error.hidden      = <span class="ck">false</span>;
+};
+
+<span class="cm">// 天気データをUIに反映する</span>
+<span class="kw">const</span> <span class="fn">showWeather</span> = (weather) => {
+  el.cityName.textContent  = <span class="cs">`</span><span class="cn">${{weather.city}}</span><span class="cs">, </span><span class="cn">${{weather.country}}</span><span class="cs">`</span>;
+  el.icon.src              = weather.icon;
+  el.desc.textContent      = weather.desc;
+  el.details.innerHTML     = <span class="cs">`
+    &lt;div class="detail"&gt;🌡 気温: </span><span class="cn">${{weather.temp}}</span><span class="cs">°C&lt;/div&gt;
+    &lt;div class="detail"&gt;🤔 体感: </span><span class="cn">${{weather.feelsLike}}</span><span class="cs">°C&lt;/div&gt;
+    &lt;div class="detail"&gt;💧 湿度: </span><span class="cn">${{weather.humidity}}</span><span class="cs">%&lt;/div&gt;
+    &lt;div class="detail"&gt;💨 風速: </span><span class="cn">${{weather.wind}}</span><span class="cs">m/s&lt;/div&gt;
+  `</span>;
+  el.result.hidden = <span class="ck">false</span>;
+};</span></div>
+</div>
+
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">fetchのres.statusが404のとき何が起きた？</div><div class="quiz-options"><div class="quiz-option wrong">通信タイムアウト</div><div class="quiz-option correct">リソースが見つからない ✅</div><div class="quiz-option wrong">サーバーエラー</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">index.htmlのHTMLを作り、inputとbuttonとローディング・エラー・結果エリアを配置しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">fetchWeather関数とformatWeather関数を実装してconsole.logで結果を確認しよう（APIキーがない場合はdummyDataを使う）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>CSSでローディングスピナーのアニメーション（回転するリング）を実装しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">天気アプリのHTML構造が作れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">fetchWeatherでAPIにリクエストが送れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">formatWeatherでデータを整形できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">setLoading・showError・showWeatherの3関数が書けた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第25回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

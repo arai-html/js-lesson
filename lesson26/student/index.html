@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第26回｜実践プロジェクト②：天気アプリ完成</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 26 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">プロジェクト②</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">実践プロジェクト②：天気アプリ完成<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">search()完成・localStorage復元・検索履歴・CSS仕上げ</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>search()関数で全処理を統合し、localStorage保存・検索履歴・レスポンシブCSSを加えてポートフォリオ品質に仕上げられる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">前回の復習と今日の完成目標を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">検索処理のメイン関数・イベント登録を完成させる</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">localStorage保存・検索履歴・追加機能を実装</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">完成・発表・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">メイン処理を完成させよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">前回作った関数をつなげてメインの処理を完成させます。localStorage保存と検索履歴も追加します。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（メインの検索処理）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// メインの検索関数</span>
+<span class="kw">const</span> <span class="fn">search</span> = <span class="kw">async</span> (city) => {
+  <span class="kw">const</span> trimmed = city.<span class="fn">trim</span>();
+  <span class="kw">if</span> (!trimmed) {
+    <span class="fn">showError</span>(<span class="cs">"都市名を入力してください"</span>);
+    <span class="kw">return</span>;
+  }
+
+  <span class="fn">setLoading</span>(<span class="ck">true</span>);
+
+  <span class="kw">try</span> {
+    <span class="kw">const</span> raw     = <span class="kw">await</span> <span class="fn">fetchWeather</span>(trimmed);
+    <span class="kw">const</span> weather = <span class="fn">formatWeather</span>(raw);
+    <span class="fn">showWeather</span>(weather);
+
+    <span class="cm">// 検索成功したら都市名をlocalStorageに保存</span>
+    localStorage.<span class="fn">setItem</span>(<span class="cs">"lastCity"</span>, trimmed);
+    <span class="fn">addToHistory</span>(trimmed);
+
+  } <span class="kw">catch</span> (error) {
+    <span class="fn">showError</span>(error.message);
+  } <span class="kw">finally</span> {
+    <span class="fn">setLoading</span>(<span class="ck">false</span>);
+  }
+};
+
+<span class="cm">// ボタンクリックで検索</span>
+el.btn.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, () => <span class="fn">search</span>(el.input.value));
+
+<span class="cm">// Enterキーでも検索できる</span>
+el.input.<span class="fn">addEventListener</span>(<span class="cs">"keydown"</span>, (e) => {
+  <span class="kw">if</span> (e.key === <span class="cs">"Enter"</span>) <span class="fn">search</span>(el.input.value);
+});
+
+<span class="cm">// ページ読み込み時に前回の都市を復元</span>
+<span class="kw">const</span> lastCity = localStorage.<span class="fn">getItem</span>(<span class="cs">"lastCity"</span>);
+<span class="kw">if</span> (lastCity) {
+  el.input.value = lastCity;
+  <span class="fn">search</span>(lastCity); <span class="cm">// 前回の都市で自動検索</span>
+}</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（検索履歴機能）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 検索履歴を管理（最大5件）</span>
+<span class="kw">let</span> history = <span class="fn">JSON</span>.<span class="fn">parse</span>(localStorage.<span class="fn">getItem</span>(<span class="cs">"searchHistory"</span>)) || [];
+
+<span class="kw">const</span> <span class="fn">addToHistory</span> = (city) => {
+  <span class="cm">// 重複を除いて先頭に追加</span>
+  history = [city, ...history.<span class="fn">filter</span>(c => c !== city)].<span class="fn">slice</span>(<span class="cn">0</span>, <span class="cn">5</span>);
+  localStorage.<span class="fn">setItem</span>(<span class="cs">"searchHistory"</span>, <span class="fn">JSON</span>.<span class="fn">stringify</span>(history));
+  <span class="fn">renderHistory</span>();
+};
+
+<span class="kw">const</span> <span class="fn">renderHistory</span> = () => {
+  <span class="kw">const</span> histEl = document.<span class="fn">querySelector</span>(<span class="cs">"#search-history"</span>);
+  <span class="kw">if</span> (!histEl) <span class="kw">return</span>;
+  histEl.innerHTML = history.<span class="fn">map</span>(city => <span class="cs">`
+    &lt;button class="history-btn" data-city="</span><span class="cn">${{city}}</span><span class="cs">"&gt;</span><span class="cn">${{city}}</span><span class="cs">&lt;/button&gt;
+  `</span>).<span class="fn">join</span>(<span class="cs">""</span>);
+};
+
+<span class="cm">// 履歴ボタンをクリックすると再検索</span>
+document.<span class="fn">querySelector</span>(<span class="cs">"#search-history"</span>)?.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, (e) => {
+  <span class="kw">if</span> (e.target.classList.<span class="fn">contains</span>(<span class="cs">"history-btn"</span>)) {
+    <span class="kw">const</span> city = e.target.dataset.city;
+    el.input.value = city;
+    <span class="fn">search</span>(city);
+  }
+});
+
+<span class="fn">renderHistory</span>(); <span class="cm">// 初期表示</span></span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">APIキーをJSファイルに直接書くのは本番環境ではNGです。GitHubにアップすると誰でも見られてしまいます。本番では環境変数（.envファイル）やサーバーサイドのプロキシを使います。今回は学習目的なので直書きOKですが、GitHubにプッシュするときは注意しましょう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">仕上げ・追加機能・発表</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">機能が完成したらCSSで見た目を整え、追加機能を実装してポートフォリオ品質に仕上げましょう。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">style.css（天気アプリのスタイル）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">/* 全体 */</span>
+.weather-app {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 32px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  border-radius: 24px;
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+<span class="cm">/* 検索ボックス */</span>
+.search-box { display: flex; gap: 8px; margin: 24px 0; }
+.search-box input {
+  flex: 1; padding: 12px 16px;
+  border: none; border-radius: 12px;
+  background: rgba(255,255,255,.15); color: #fff;
+  font-size: 15px;
+}
+.search-box input::placeholder { color: rgba(255,255,255,.5); }
+
+<span class="cm">/* ローディングスピナー */</span>
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid rgba(255,255,255,.2);
+  border-top-color: #f7df1e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+<span class="cm">/* 天気結果 */</span>
+#weather-result { text-align: center; animation: fadeIn 0.5s ease; }
+#weather-icon   { width: 100px; height: 100px; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; } }</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">ポートフォリオへの組み込みポイント</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">採用担当者に刺さるアピール方法</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">① <strong>README.md</strong>にスクリーンショット・使い方・使用技術を書く<br>② <strong>GitHub Pages</strong>で公開してURLをポートフォリオに貼る<br>③ APIキーは<code>.gitignore</code>で除外するか<code>const API_KEY = prompt('APIキーを入力')</code>で入力式にする<br>④ レスポンシブ対応（スマホでも見られるように）<br>⑤ エラー処理・ローディングが実装されている → 「実務を意識した実装」としてアピール</div>
+</div>
+
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">APIキーをGitHubにアップしてはいけない理由は？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">ファイルが重くなる</div><div class="quiz-option" onclick="answer(this,true)">誰でも見られて悪用される</div><div class="quiz-option" onclick="answer(this,false)">パフォーマンスが下がる</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">仕上げワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">全機能（検索・ローディング・エラー・結果表示・履歴・localStorageで復元）が動くことを確認しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>気温によって背景グラデーションを変えよう（0度以下→青・20度以上→オレンジ・それ以外→緑）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>現在地ボタンを追加し、navigator.geolocationで座標を取得して近くの天気を表示しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">search()関数で全処理がつながった</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">Enterキー・ボタンクリック両方で検索できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">localStorage で前回の都市が復元できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">検索履歴が最大5件表示・クリックで再検索できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第26回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

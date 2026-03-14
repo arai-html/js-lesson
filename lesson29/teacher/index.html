@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第29回｜デバッグとパフォーマンス最適化</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 29 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">デバッグ</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">デバッグとパフォーマンス最適化<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">よくあるバグパターン・ブレークポイント・DOM最適化・Lighthouse</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>よくあるバグパターン6つを説明でき、デベロッパーツールのブレークポイントが使え、DOM操作のバッチ処理でパフォーマンスを改善できる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">デバッグとパフォーマンスの概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">デベロッパーツール活用・よくあるバグパターンを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">パフォーマンス計測・最適化テクニックを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">デバッグをマスターしよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「プロのエンジニアも毎日バグと戦っています。大切なのはバグに出会ったとき焦らず原因を特定する手順を持つことです。デベロッパーツールのブレークポイント・console系メソッド・よくあるバグパターンを体系的に学びます。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（よくあるバグと解決策①）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// ❌ バグ①：undefined のプロパティにアクセス</span>
+<span class="kw">const</span> user = <span class="ck">null</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(user.name); <span class="cm">// TypeError: Cannot read properties of null</span>
+
+<span class="cm">// ✅ 解決：オプショナルチェーンでガード</span>
+<span class="fn">console</span>.<span class="fn">log</span>(user?.name); <span class="cm">// undefined（エラーにならない）</span>
+
+
+<span class="cm">// ❌ バグ②：非同期処理の順序ミス</span>
+<span class="kw">let</span> data;
+<span class="fn">fetch</span>(<span class="cs">"https://jsonplaceholder.typicode.com/users/1"</span>)
+  .<span class="fn">then</span>(r => r.<span class="fn">json</span>())
+  .<span class="fn">then</span>(d => { data = d; });
+<span class="fn">console</span>.<span class="fn">log</span>(data); <span class="cm">// undefined！（fetchはまだ完了していない）</span>
+
+<span class="cm">// ✅ 解決：await で待つ</span>
+<span class="kw">const</span> <span class="fn">load</span> = <span class="kw">async</span> () => {
+  <span class="kw">const</span> res  = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="cs">"https://jsonplaceholder.typicode.com/users/1"</span>);
+  <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+  <span class="fn">console</span>.<span class="fn">log</span>(data); <span class="cm">// 正しく取得できる</span>
+};
+
+
+<span class="cm">// ❌ バグ③：配列メソッドの戻り値を使い忘れ</span>
+<span class="kw">const</span> nums = [<span class="cn">1</span>, <span class="cn">2</span>, <span class="cn">3</span>];
+nums.<span class="fn">map</span>(n => n * <span class="cn">2</span>);               <span class="cm">// 戻り値を捨てている！</span>
+<span class="fn">console</span>.<span class="fn">log</span>(nums);                    <span class="cm">// [1, 2, 3]（変わっていない）</span>
+
+<span class="cm">// ✅ 解決：戻り値を変数に代入</span>
+<span class="kw">const</span> doubled = nums.<span class="fn">map</span>(n => n * <span class="cn">2</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(doubled);                  <span class="cm">// [2, 4, 6]</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（よくあるバグと解決策②）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// ❌ バグ④：===ではなく==を使った比較</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">0</span>   == <span class="cs">""</span>);   <span class="cm">// true（型変換される！）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="ck">null</span> == <span class="ck">undefined</span>); <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">1</span>   == <span class="cs">"1"</span>); <span class="cm">// true</span>
+
+<span class="cm">// ✅ 解決：常に=== を使う</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">1</span> === <span class="cs">"1"</span>); <span class="cm">// false（型も一致しないとfalse）</span>
+
+
+<span class="cm">// ❌ バグ⑤：sort()が数値を文字列として並べる</span>
+<span class="kw">const</span> arr = [<span class="cn">10</span>, <span class="cn">9</span>, <span class="cn">2</span>, <span class="cn">100</span>, <span class="cn">21</span>];
+<span class="fn">console</span>.<span class="fn">log</span>(arr.<span class="fn">sort</span>());        <span class="cm">// [10, 100, 2, 21, 9]（文字列順！）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(arr.<span class="fn">sort</span>((a,b) => a - b)); <span class="cm">// [2, 9, 10, 21, 100]（数値順）</span>
+
+
+<span class="cm">// ❌ バグ⑥：オブジェクトの参照コピー</span>
+<span class="kw">const</span> orig = { name: <span class="cs">"太郎"</span>, age: <span class="cn">25</span> };
+<span class="kw">const</span> copy = orig;           <span class="cm">// 参照コピー！</span>
+copy.age   = <span class="cn">99</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(orig.age);       <span class="cm">// 99（origも変わってしまった！）</span>
+
+<span class="cm">// ✅ 解決：スプレッド構文でシャローコピー</span>
+<span class="kw">const</span> copy2 = { ...orig };
+copy2.age   = <span class="cn">99</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(orig.age);        <span class="cm">// 25（origは変わらない）</span></span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">デバッグの基本手順</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">焦らず3ステップで</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">① <strong>エラーメッセージを読む</strong>：行番号・エラー種別を確認<br>② <strong>原因を仮定する</strong>：「どこで何が起きているか」を考える<br>③ <strong>console.log・ブレークポイントで確認</strong>：仮定を検証する<br><br>デベロッパーツールのSourcesタブ→行番号クリックでブレークポイント設定→変数の中身をリアルタイムで確認できます。</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>よくあるバグ①〜⑥を実際に動かしながら「これ見たことある！」と共感させる。特に非同期処理の順序ミス（バグ②）は全員が一度は踏む落とし穴。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">sort()で数値を正しく昇順ソートするには？</div><div class="quiz-options"><div class="quiz-option wrong">arr.sort()</div><div class="quiz-option correct">arr.sort((a,b) => a-b) ✅</div><div class="quiz-option wrong">arr.sort('asc')</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">パフォーマンス最適化</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「パフォーマンスとは処理速度とメモリ効率のことです。学習段階では深く考えなくていいですが、基本的な考え方を知っておくとプロのコードを読んだときに意図が分かります。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（パフォーマンス改善のポイント）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// ① DOM操作は最小限に（バッチ処理）</span>
+<span class="cm">// ❌ ループ内で毎回DOM操作</span>
+<span class="kw">const</span> list = document.<span class="fn">querySelector</span>(<span class="cs">"ul"</span>);
+[<span class="cs">"A"</span>,<span class="cs">"B"</span>,<span class="cs">"C"</span>].<span class="fn">forEach</span>(item => {
+  list.innerHTML += <span class="cs">`&lt;li&gt;</span><span class="cn">${{item}}</span><span class="cs">&lt;/li&gt;`</span>; <span class="cm">// 毎回リフロー発生！</span>
+});
+
+<span class="cm">// ✅ 一括でinnerHTMLを更新</span>
+list.innerHTML = [<span class="cs">"A"</span>,<span class="cs">"B"</span>,<span class="cs">"C"</span>].<span class="fn">map</span>(i => <span class="cs">`&lt;li&gt;</span><span class="cn">${{i}}</span><span class="cs">&lt;/li&gt;`</span>).<span class="fn">join</span>(<span class="cs">""</span>);
+
+
+<span class="cm">// ② 重い処理をdebounce/throttleで間引く（第18回参照）</span>
+
+<span class="cm">// ③ 不要なイベントリスナーを解除する</span>
+<span class="kw">const</span> <span class="fn">handler</span> = () => <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"clicked"</span>);
+document.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, handler);
+<span class="cm">// 不要になったら解除</span>
+document.<span class="fn">removeEventListener</span>(<span class="cs">"click"</span>, handler);
+
+
+<span class="cm">// ④ 画像の遅延読み込み（loading="lazy"）</span>
+<span class="cm">// &lt;img src="photo.jpg" loading="lazy" alt=""&gt;
+// ← ビューポートに近づいたとき初めて読み込む</span>
+
+
+<span class="cm">// ⑤ console.timeで処理時間を計測</span>
+<span class="fn">console</span>.<span class="fn">time</span>(<span class="cs">"重い処理"</span>);
+<span class="kw">const</span> result = <span class="fn">Array</span>.<span class="fn">from</span>({ length: <span class="cn">100000</span> }, (_, i) => i * <span class="cn">2</span>);
+<span class="fn">console</span>.<span class="fn">timeEnd</span>(<span class="cs">"重い処理"</span>); <span class="cm">// "重い処理: X.XXms"</span>
+
+
+<span class="cm">// ⑥ Lighthouseでページ全体のパフォーマンスを計測</span>
+<span class="cm">// DevTools → Lighthouseタブ → Analyze page load</span></span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">Chromeの<strong>Lighthouseツール</strong>（DevTools→Lighthouseタブ）はページのパフォーマンス・SEO・アクセシビリティ・ベストプラクティスを自動で採点してくれます。ポートフォリオサイトをLighthouseで90点以上にしておくと就職活動でのアピールポイントになります。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">今まで作ったコードの中でよくあるバグパターン（参照コピー・sort()の数値比較・==の使用）がないか確認して修正しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">console.timeを使って、100件の要素を「ループ内でappendChild」と「一括innerHTML」で追加する速度を比較しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>自分のコードをChromeのLighthouseで計測して、改善提案を1つ実装してみよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">よくあるバグパターン6つが説明できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">デベロッパーツールのブレークポイントが使えた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">DOM操作のバッチ処理でパフォーマンス改善できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">console.timeで処理時間を計測できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第29回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

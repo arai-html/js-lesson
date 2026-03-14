@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第28回｜実践プロジェクト④：クイズアプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 28 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">プロジェクト④</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">実践プロジェクト④：クイズアプリ<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">Fisher-Yatesシャッフル・タイマー・状態管理・結果画面</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>Fisher-Yatesシャッフル・setIntervalタイマー・回答判定・結果画面を実装したクイズアプリが完成できる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">クイズアプリの設計を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">問題データ・状態管理・render関数を実装</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">タイマー・スコア・結果画面を実装</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">CSS仕上げ・発表</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">クイズアプリを設計しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「クイズアプリはsetInterval（タイマー）・配列操作（シャッフル）・状態管理・条件分岐・DOMの切り替えが全部詰まった総合演習です。状態をオブジェクトで一元管理して、render()で画面を更新するパターンを使います。」</div></div>
+<div class="intro-box">
+<div class="intro-icon">🧠</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">クイズアプリの完成機能</div>
+<div style="font-size:14px;line-height:1.8;color:#555;">① 問題データ（配列）からランダムに出題<br>② 4択から選択 → 正解/不正解を色で表示<br>③ 1問につき15秒のカウントダウンタイマー<br>④ タイムアップで自動的に次の問題へ<br>⑤ 全問終了で結果画面（スコア・正答率）<br>⑥ 「もう一度」でリセット</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（問題データとシャッフル）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 問題データ（実際には多く用意する）</span>
+<span class="kw">const</span> questions = [
+  {
+    question: <span class="cs">"JavaScriptで配列の最後に要素を追加するメソッドは？"</span>,
+    choices:  [<span class="cs">"push"</span>, <span class="cs">"pop"</span>, <span class="cs">"shift"</span>, <span class="cs">"unshift"</span>],
+    answer:   <span class="cn">0</span> <span class="cm">// 正解のインデックス</span>
+  },
+  {
+    question: <span class="cs">"NaNを検出するJavaScriptの関数は？"</span>,
+    choices:  [<span class="cs">"isNull()"</span>, <span class="cs">"isUndefined()"</span>, <span class="cs">"isNaN()"</span>, <span class="cs">"isEmpty()"</span>],
+    answer:   <span class="cn">2</span>
+  },
+  {
+    question: <span class="cs">"Promiseの状態として正しくないものは？"</span>,
+    choices:  [<span class="cs">"pending"</span>, <span class="cs">"fulfilled"</span>, <span class="cs">"rejected"</span>, <span class="cs">"waiting"</span>],
+    answer:   <span class="cn">3</span>
+  },
+  {
+    question: <span class="cs">"CSSでフレックスコンテナを作るプロパティは？"</span>,
+    choices:  [<span class="cs">"display: grid"</span>, <span class="cs">"display: flex"</span>, <span class="cs">"float: left"</span>, <span class="cs">"position: flex"</span>],
+    answer:   <span class="cn">1</span>
+  },
+];
+
+<span class="cm">// 配列をシャッフルする（Fisher-Yatesアルゴリズム）</span>
+<span class="kw">const</span> <span class="fn">shuffle</span> = (arr) => {
+  <span class="kw">const</span> a = [...arr];
+  <span class="kw">for</span> (<span class="kw">let</span> i = a.length - <span class="cn">1</span>; i > <span class="cn">0</span>; i--) {
+    <span class="kw">const</span> j = <span class="fn">Math</span>.<span class="fn">floor</span>(<span class="fn">Math</span>.<span class="fn">random</span>() * (i + <span class="cn">1</span>));
+    [a[i], a[j]] = [a[j], a[i]]; <span class="cm">// 分割代入でスワップ</span>
+  }
+  <span class="kw">return</span> a;
+};</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（状態管理・メイン処理）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 状態</span>
+<span class="kw">let</span> state = {
+  questions: [],   <span class="cm">// シャッフル済み問題</span>
+  current:   <span class="cn">0</span>,   <span class="cm">// 現在の問題インデックス</span>
+  score:     <span class="cn">0</span>,   <span class="cm">// 正解数</span>
+  answered:  <span class="ck">false</span>, <span class="cm">// この問題に回答済みか</span>
+  timeLeft:  <span class="cn">15</span>,  <span class="cm">// 残り時間</span>
+  timerId:   <span class="ck">null</span>, <span class="cm">// setIntervalのID</span>
+};
+
+<span class="cm">// ゲームを開始</span>
+<span class="kw">const</span> <span class="fn">startGame</span> = () => {
+  state = {
+    questions: <span class="fn">shuffle</span>(questions),
+    current:   <span class="cn">0</span>,
+    score:     <span class="cn">0</span>,
+    answered:  <span class="ck">false</span>,
+    timeLeft:  <span class="cn">15</span>,
+    timerId:   <span class="ck">null</span>,
+  };
+  <span class="fn">renderQuestion</span>();
+  <span class="fn">startTimer</span>();
+};
+
+<span class="cm">// 回答処理</span>
+<span class="kw">const</span> <span class="fn">answer</span> = (index) => {
+  <span class="kw">if</span> (state.answered) <span class="kw">return</span>; <span class="cm">// 回答済みは無視</span>
+  state.answered = <span class="ck">true</span>;
+  <span class="fn">clearInterval</span>(state.timerId); <span class="cm">// タイマー停止</span>
+
+  <span class="kw">const</span> q       = state.questions[state.current];
+  <span class="kw">const</span> correct = index === q.answer;
+  <span class="kw">if</span> (correct) state.score++;
+
+  <span class="fn">showAnswer</span>(index, q.answer, correct);
+
+  <span class="cm">// 1秒後に次の問題へ</span>
+  <span class="fn">setTimeout</span>(() => <span class="fn">nextQuestion</span>(), <span class="cn">1500</span>);
+};</span></div>
+</div>
+
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>Fisher-Yatesシャッフルはランダム性が均一な標準的なアルゴリズム。arr.sort(() => Math.random() - 0.5)より正確。ただしこの講義では深入りせず「ちゃんとしたシャッフル関数」として紹介する程度でOK。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">タイマー・結果画面・CSS仕上げ</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「タイマーはsetIntervalで1秒ずつ減らします。0になったら時間切れとして自動で次へ進みます。全問終了後の結果画面では正答率を計算して表示します。CSSでアニメーションを加えて完成度を上げましょう。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（タイマー・次の問題・結果画面）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// タイマー処理</span>
+<span class="kw">const</span> <span class="fn">startTimer</span> = () => {
+  state.timeLeft = <span class="cn">15</span>;
+  <span class="fn">updateTimerUI</span>();
+  state.timerId = <span class="fn">setInterval</span>(() => {
+    state.timeLeft--;
+    <span class="fn">updateTimerUI</span>();
+    <span class="kw">if</span> (state.timeLeft <= <span class="cn">0</span>) {
+      <span class="fn">clearInterval</span>(state.timerId);
+      <span class="kw">if</span> (!state.answered) <span class="fn">answer</span>(-<span class="cn">1</span>); <span class="cm">// 時間切れ→不正解扱い</span>
+    }
+  }, <span class="cn">1000</span>);
+};
+
+<span class="kw">const</span> <span class="fn">updateTimerUI</span> = () => {
+  <span class="kw">const</span> el = document.<span class="fn">querySelector</span>(<span class="cs">"#timer"</span>);
+  <span class="kw">if</span> (!el) <span class="kw">return</span>;
+  el.textContent = state.timeLeft;
+  el.classList.<span class="fn">toggle</span>(<span class="cs">"danger"</span>, state.timeLeft <= <span class="cn">5</span>); <span class="cm">// 残り5秒で赤色</span>
+};
+
+<span class="cm">// 次の問題へ</span>
+<span class="kw">const</span> <span class="fn">nextQuestion</span> = () => {
+  state.current++;
+  <span class="kw">if</span> (state.current >= state.questions.length) {
+    <span class="fn">showResult</span>(); <span class="cm">// 全問終了</span>
+    <span class="kw">return</span>;
+  }
+  state.answered = <span class="ck">false</span>;
+  state.timeLeft = <span class="cn">15</span>;
+  <span class="fn">renderQuestion</span>();
+  <span class="fn">startTimer</span>();
+};
+
+<span class="cm">// 結果画面</span>
+<span class="kw">const</span> <span class="fn">showResult</span> = () => {
+  <span class="kw">const</span> total   = state.questions.length;
+  <span class="kw">const</span> pct     = <span class="fn">Math</span>.<span class="fn">round</span>(state.score / total * <span class="cn">100</span>);
+  <span class="kw">const</span> message = pct >= <span class="cn">80</span> ? <span class="cs">"🎉 素晴らしい！"</span>
+                : pct >= <span class="cn">50</span> ? <span class="cs">"👍 もう少し！"</span>
+                :               <span class="cs">"📚 もっと勉強しよう！"</span>;
+
+  document.<span class="fn">querySelector</span>(<span class="cs">"#quiz-area"</span>).innerHTML = <span class="cs">`
+    &lt;div class="result"&gt;
+      &lt;h2&gt;結果発表&lt;/h2&gt;
+      &lt;div class="score"&gt;</span><span class="cn">${{state.score}}</span><span class="cs"> / </span><span class="cn">${{total}}</span><span class="cs">&lt;/div&gt;
+      &lt;div class="percent"&gt;正答率 </span><span class="cn">${{pct}}</span><span class="cs">%&lt;/div&gt;
+      &lt;p class="message"&gt;</span><span class="cn">${{message}}</span><span class="cs">&lt;/p&gt;
+      &lt;button id="retry-btn"&gt;もう一度挑戦！&lt;/button&gt;
+    &lt;/div&gt;
+  `</span>;
+  document.<span class="fn">querySelector</span>(<span class="cs">"#retry-btn"</span>).<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, startGame);
+};
+
+<span class="fn">startGame</span>(); <span class="cm">// ゲーム開始</span></span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">タイマーは必ず<code>clearInterval(state.timerId)</code>で止めてから次に進みましょう。止め忘れると古いタイマーと新しいタイマーが重複して動き、予期しない動作の原因になります。「タイマーを使ったら必ず止める」を鉄則にしましょう。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">配列をランダムにシャッフルする標準的なアルゴリズムの名前は？</div><div class="quiz-options"><div class="quiz-option wrong">QuickSort</div><div class="quiz-option correct">Fisher-Yates ✅</div><div class="quiz-option wrong">BubbleSort</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">クイズアプリを完成させよう（問題表示・選択・タイマー・結果画面・もう一度）。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>問題数を10問に増やし、カテゴリ（HTML/CSS/JavaScript）を追加してカテゴリ選択画面を作ろう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>最高スコアをlocalStorageに保存して「ハイスコア更新！」と表示できるようにしよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">Fisher-Yatesシャッフルで問題をランダム出題できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">setIntervalでカウントダウンタイマーが動いた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">回答後にclearIntervalでタイマーを止められた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">全問終了後に正答率を計算して結果画面を表示できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第28回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

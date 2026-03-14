@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第31回｜React入門①：なぜReactを使うのか</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 31 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">React①</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">React入門①：なぜReactを使うのか<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">JSX・コンポーネント・props・map()でリスト・key</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>CDN+BabelでReactを動かし、JSXのルール・コンポーネント定義・propsでデータを渡し・map()でリストを動的レンダリングできる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">なぜReactが生まれたか・概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">環境構築・JSXの書き方を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">コンポーネント・propsを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">なぜReactが必要なのか</div>
+<div class="sec-time">0〜15分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「第10回・第22回・第27回でデータをUIに反映するrender()関数を作ってきました。アプリが大きくなると『どのデータが変わったとき・どのUIを更新するか』の管理が爆発的に複雑になります。Reactはこの問題を解決するために生まれた『UIを自動で再描画してくれるライブラリ』です。」</div></div>
+<div class="intro-box">
+<div class="intro-icon">⚛️</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">バニラJSとReactの違い</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><strong>バニラJS</strong>：<br>① データを変更する<br>② render()を手動で呼ぶ<br>③ DOMを自分で更新する<br><br><strong>React</strong>：<br>① stateを変更する（setState）<br>② Reactが自動でUIを再描画<br>③ 変更があった部分だけ効率よく更新（Virtual DOM）<br><br>「状態を変えればUIは自動でついてくる」がReactの約束です。</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">index.html（Reactをscriptタグで読み込む）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">&lt;!-- CDNでReactを読み込む（学習用） --&gt;</span>
+<span class="ck">&lt;script</span> <span class="fn">src</span>=<span class="cs">"https://unpkg.com/react@18/umd/react.development.js"</span><span class="ck">&gt;&lt;/script&gt;</span>
+<span class="ck">&lt;script</span> <span class="fn">src</span>=<span class="cs">"https://unpkg.com/react-dom@18/umd/react-dom.development.js"</span><span class="ck">&gt;&lt;/script&gt;</span>
+<span class="ck">&lt;script</span> <span class="fn">src</span>=<span class="cs">"https://unpkg.com/@babel/standalone/babel.min.js"</span><span class="ck">&gt;&lt;/script&gt;</span>
+
+<span class="ck">&lt;div</span> <span class="fn">id</span>=<span class="cs">"root"</span><span class="ck">&gt;&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- type="text/babel" でJSXをブラウザで変換 --&gt;</span>
+<span class="ck">&lt;script</span> <span class="fn">type</span>=<span class="cs">"text/babel"</span><span class="ck">&gt;</span>
+  <span class="cm">// Reactコードをここに書く</span>
+<span class="ck">&lt;/script&gt;</span></div>
+</div>
+
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>本番はVite（npm create vite@latest）を使うが、学習段階はCDN+Babelで環境構築ゼロで始めるのがベスト。「まず動く体験」が先。環境構築でつまずいてやる気を失わないように。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">JSXとコンポーネントの基本</div>
+<div class="sec-time">15〜40分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「JSXはJavaScriptの中にHTMLのような記法でUIを書ける構文です。Reactのコンポーネントは関数として定義し、JSXを返します。コンポーネントを組み合わせてUIを構成するのがReactの基本スタイルです。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">app.jsx（JSXの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// JSX：JSの中にHTMLのような記法でUIを書く</span>
+<span class="kw">const</span> <span class="fn">Hello</span> = () => {
+  <span class="kw">return</span> (
+    <span class="ck">&lt;div</span> <span class="fn">className</span>=<span class="cs">"hello"</span><span class="ck">&gt;</span>
+      <span class="ck">&lt;h1&gt;</span>こんにちは！<span class="ck">&lt;/h1&gt;</span>
+      <span class="ck">&lt;p&gt;</span>Reactへようこそ<span class="ck">&lt;/p&gt;</span>
+    <span class="ck">&lt;/div&gt;</span>
+  );
+};
+
+<span class="cm">// JSXのルール</span>
+<span class="cm">// ① classではなくclassName</span>
+<span class="cm">// ② 複数要素は1つの要素で囲む（または<>...</>）</span>
+<span class="cm">// ③ {}でJSの式を埋め込める</span>
+<span class="cm">// ④ self-closingタグは&lt;br /&gt;のように閉じる</span>
+
+<span class="kw">const</span> name = <span class="cs">"田中"</span>;
+<span class="kw">const</span> <span class="fn">Greeting</span> = () => (
+  <span class="ck">&lt;&gt;</span>
+    <span class="ck">&lt;h1&gt;</span>こんにちは、{name}さん！<span class="ck">&lt;/h1&gt;</span>
+    <span class="ck">&lt;p&gt;</span>今日は{<span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleDateString</span>(<span class="cs">"ja-JP"</span>)}です<span class="ck">&lt;/p&gt;</span>
+    <span class="ck">&lt;p&gt;</span>{<span class="cn">1</span> + <span class="cn">2</span> === <span class="cn">3</span> ? <span class="cs">"計算OK"</span> : <span class="cs">"バグ！"</span>}<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;/&gt;</span>
+);
+
+<span class="cm">// ReactDOMでrootにマウント</span>
+<span class="kw">const</span> root = ReactDOM.<span class="fn">createRoot</span>(document.<span class="fn">getElementById</span>(<span class="cs">"root"</span>));
+root.<span class="fn">render</span>(<span class="ck">&lt;Greeting /&gt;</span>);</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">app.jsx（コンポーネントとprops）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// propsは親から子へデータを渡す仕組み</span>
+<span class="kw">const</span> <span class="fn">UserCard</span> = ({ name, age, role }) => (
+  <span class="ck">&lt;div</span> <span class="fn">className</span>=<span class="cs">"user-card"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h3&gt;</span>{name}<span class="ck">&lt;/h3&gt;</span>
+    <span class="ck">&lt;p&gt;</span>{age}歳 / {role}<span class="ck">&lt;/p&gt;</span>
+  <span class="ck">&lt;/div&gt;</span>
+);
+
+<span class="cm">// 配列からコンポーネントを動的に生成（keyが必要！）</span>
+<span class="kw">const</span> users = [
+  { id: <span class="cn">1</span>, name: <span class="cs">"田中"</span>, age: <span class="cn">25</span>, role: <span class="cs">"エンジニア"</span> },
+  { id: <span class="cn">2</span>, name: <span class="cs">"山田"</span>, age: <span class="cn">30</span>, role: <span class="cs">"デザイナー"</span> },
+  { id: <span class="cn">3</span>, name: <span class="cs">"鈴木"</span>, age: <span class="cn">22</span>, role: <span class="cs">"マーケター"</span> },
+];
+
+<span class="kw">const</span> <span class="fn">UserList</span> = () => (
+  <span class="ck">&lt;div</span> <span class="fn">className</span>=<span class="cs">"user-list"</span><span class="ck">&gt;</span>
+    <span class="ck">&lt;h2&gt;</span>メンバー一覧<span class="ck">&lt;/h2&gt;</span>
+    {users.<span class="fn">map</span>(user => (
+      <span class="ck">&lt;UserCard</span>
+        <span class="fn">key</span>={user.id}
+        <span class="fn">name</span>={user.name}
+        <span class="fn">age</span>={user.age}
+        <span class="fn">role</span>={user.role}
+      <span class="ck">/&gt;</span>
+    ))}
+  <span class="ck">&lt;/div&gt;</span>
+);
+
+root.<span class="fn">render</span>(<span class="ck">&lt;UserList /&gt;</span>);</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">keyプロパティはなぜ必要？</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">Reactがリストの差分を効率よく検出するため</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">リストをmap()でレンダリングするとき、各要素に<code>key</code>プロパティが必要です。<br><br>Reactはkeyを使ってどの要素が変わったかを判断し、変更のある部分だけ再描画します（Virtual DOM）。<br><br>• ✅ keyはユニークな値（id・indexは最終手段）<br>• ❌ keyを省略すると警告が出てパフォーマンスが落ちる</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>JSXはBabelでJavaScriptに変換される。React.createElement('h1', null, 'こんにちは')という呼び出しになることをちらっと見せると「JSXは構文糖衣」という理解が生まれる。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">JSXでCSSのclassを指定するときに使う属性名は？</div><div class="quiz-options"><div class="quiz-option wrong">class</div><div class="quiz-option correct">className ✅</div><div class="quiz-option wrong">cssClass</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">Greetingコンポーネントを作り、name・age・hobbyをpropsで受け取って自己紹介カードを表示しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">商品データの配列からProductCardコンポーネントをmap()で生成する商品一覧を作ろう（keyを忘れずに）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>propsにchildrenを使って、どんな内容でも包める汎用Cardコンポーネントを作ろう（<code>{'<'}Card title="見出し">本文{'<'}/Card></code>）。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">CDN+BabelでReactが動く環境を作れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">JSXのルール（className・{}・self-closing）が分かった</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">propsで親から子へデータを渡せた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">map()でリストを動的にレンダリングし、keyを付けられた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第31回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>
