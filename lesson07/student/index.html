@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第07回｜オブジェクトを使いこなそう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 07 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">JS基礎⑦</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">オブジェクトを使いこなそう<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">オブジェクト・Object.keys/values・分割代入・スプレッド構文</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>オブジェクトの作成・操作・Object.keys/valuesが使え、分割代入とスプレッド構文で現代的な書き方ができるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">オブジェクトの概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">オブジェクトの作成・プロパティ操作を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">メソッド・分割代入・スプレッド構文を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">オブジェクトを作って操作しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">オブジェクトは関連するデータをキーと値のペアでまとめる仕組みです。実務で最もよく使うデータ構造です。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（オブジェクトの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// オブジェクトの作成（{}で囲み、キー: 値 のペアを書く）</span>
+<span class="kw">const</span> user = {
+  name:     <span class="cs">"田中 太郎"</span>,
+  age:      <span class="cn">25</span>,
+  isActive: <span class="ck">true</span>,
+  email:    <span class="cs">"taro@example.com"</span>
+};
+
+<span class="cm">// プロパティへのアクセス（ドット記法）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(user.name);     <span class="cm">// "田中 太郎"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(user.age);      <span class="cm">// 25</span>
+
+<span class="cm">// プロパティへのアクセス（ブラケット記法）← 変数でキーを指定するとき</span>
+<span class="kw">const</span> key = <span class="cs">"name"</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(user[key]);     <span class="cm">// "田中 太郎"</span>
+
+<span class="cm">// プロパティの追加・変更・削除</span>
+user.phone = <span class="cs">"090-0000-0000"</span>; <span class="cm">// 追加</span>
+user.age   = <span class="cn">26</span>;               <span class="cm">// 変更</span>
+<span class="kw">delete</span> user.isActive;           <span class="cm">// 削除</span>
+
+<span class="fn">console</span>.<span class="fn">log</span>(user);</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（オブジェクトの便利な操作）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> product = {
+  name:  <span class="cs">"ノートPC"</span>,
+  price: <span class="cn">98000</span>,
+  stock: <span class="cn">5</span>
+};
+
+<span class="cm">// キー・値・エントリーの一覧を取得</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Object</span>.<span class="fn">keys</span>(product));    <span class="cm">// ["name","price","stock"]</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Object</span>.<span class="fn">values</span>(product));  <span class="cm">// ["ノートPC", 98000, 5]</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Object</span>.<span class="fn">entries</span>(product)); <span class="cm">// [["name","ノートPC"],...]</span>
+
+<span class="cm">// for...inでオブジェクトのキーをループ</span>
+<span class="kw">for</span> (<span class="kw">const</span> key <span class="kw">in</span> product) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`</span><span class="cn">${{key}}</span><span class="cs">: </span><span class="cn">${{product[key]}}</span><span class="cs">`</span>);
+}
+
+<span class="cm">// プロパティの存在チェック</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"name"</span> <span class="kw">in</span> product);   <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"color"</span> <span class="kw">in</span> product);  <span class="cm">// false</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">オブジェクトの配列（最重要パターン）</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">実務で必ず出てくる</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><code>[{}, {}, {}]</code> という「オブジェクトの配列」は実務で最もよく登場します。<br><br>例：<code>[{{id:1, name:'りんご', price:200}}, {{id:2, name:'バナナ', price:100}}]</code><br><br>このパターンにmap/filterを組み合わせることで、商品リスト・ユーザー一覧・ToDoリストなどあらゆるUIを作れます。</div>
+</div>
+
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">分割代入・スプレッド構文・メソッド</div>
+<div class="sec-time">25〜40分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">分割代入とスプレッド構文は現代JSの必須構文です。コードが短くスッキリ書けます。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（分割代入）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> user = { name: <span class="cs">"太郎"</span>, age: <span class="cn">25</span>, city: <span class="cs">"東京"</span> };
+
+<span class="cm">// 従来の書き方</span>
+<span class="kw">const</span> name1 = user.name;
+<span class="kw">const</span> age1  = user.age;
+
+<span class="cm">// 分割代入（オブジェクト）← 一気に取り出せる！</span>
+<span class="kw">const</span> { name, age, city } = user;
+<span class="fn">console</span>.<span class="fn">log</span>(name, age, city); <span class="cm">// "太郎" 25 "東京"</span>
+
+<span class="cm">// 別名をつけて取り出す</span>
+<span class="kw">const</span> { name: userName, age: userAge } = user;
+<span class="fn">console</span>.<span class="fn">log</span>(userName); <span class="cm">// "太郎"</span>
+
+<span class="cm">// 配列の分割代入</span>
+<span class="kw">const</span> [first, second, third] = [<span class="cs">"a"</span>, <span class="cs">"b"</span>, <span class="cs">"c"</span>];
+<span class="fn">console</span>.<span class="fn">log</span>(first);  <span class="cm">// "a"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(third);  <span class="cm">// "c"</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（スプレッド構文）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// スプレッド構文（...）：配列・オブジェクトを展開する</span>
+
+<span class="cm">// 配列のコピー・結合</span>
+<span class="kw">const</span> arr1 = [<span class="cn">1</span>, <span class="cn">2</span>, <span class="cn">3</span>];
+<span class="kw">const</span> arr2 = [<span class="cn">4</span>, <span class="cn">5</span>, <span class="cn">6</span>];
+<span class="kw">const</span> combined = [...arr1, ...arr2];
+<span class="fn">console</span>.<span class="fn">log</span>(combined); <span class="cm">// [1, 2, 3, 4, 5, 6]</span>
+
+<span class="cm">// オブジェクトのコピー・マージ</span>
+<span class="kw">const</span> base    = { name: <span class="cs">"太郎"</span>, age: <span class="cn">25</span> };
+<span class="kw">const</span> updated = { ...base, age: <span class="cn">26</span>, city: <span class="cs">"大阪"</span> };
+<span class="cm">// ageは上書き、cityは追加される</span>
+<span class="fn">console</span>.<span class="fn">log</span>(updated); <span class="cm">// {name:"太郎", age:26, city:"大阪"}</span>
+
+<span class="cm">// 関数の引数として配列を展開</span>
+<span class="kw">const</span> nums = [<span class="cn">3</span>, <span class="cn">1</span>, <span class="cn">4</span>, <span class="cn">1</span>, <span class="cn">5</span>];
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">Math</span>.<span class="fn">max</span>(...nums)); <span class="cm">// 5</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">スプレッド構文でオブジェクトをコピーするとき、<code>const copy = original</code> では参照コピー（同じオブジェクトを指す）になります。<code>const copy = {{...original}}</code> なら独立したコピーになります。これを知らないと意図しない書き換えが起きます。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">オブジェクトから複数のプロパティを一度に取り出す構文は？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">スプレッド構文</div><div class="quiz-option" onclick="answer(this,true)">分割代入</div><div class="quiz-option" onclick="answer(this,false)">テンプレートリテラル</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">40〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">自分のプロフィールオブジェクト（name・age・hobby・city）を作り、テンプレートリテラルで自己紹介文を表示しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">商品オブジェクトの配列を3件作り、map()で「商品名：〇〇、価格：〇〇円」と一覧表示しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>スプレッド構文を使って、既存のユーザーオブジェクトをコピーして一部のプロパティだけ変更した新しいオブジェクトを作ろう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">オブジェクトの作成・プロパティへのアクセスができた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">Object.keys/values/entriesが使えた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">分割代入でプロパティを一気に取り出せた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">スプレッド構文でオブジェクトをコピー・マージできた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第07回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

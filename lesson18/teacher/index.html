@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第18回｜高階関数とコールバック</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 18 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">応用⑥</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">高階関数とコールバック<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">コールバック・関数を返す関数・クロージャ・debounce</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>コールバック関数・関数を返す関数・クロージャの概念を理解し、debounceなど実用的な高階関数パターンが実装できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">高階関数の概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">コールバック関数・関数を返す関数を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">クロージャ・カリー化・メモ化を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">高階関数とコールバックを理解しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「高階関数とは、関数を引数として受け取ったり、関数を戻り値として返したりする関数のことです。JavaScriptでは関数も値のひとつなので、他の値と同じように引数に渡したり変数に代入したりできます。」</div></div>
+<div class="intro-box">
+<div class="intro-icon">💡</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">実はもう使っていた！</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><code>arr.map(fn)</code>・<code>arr.filter(fn)</code>・<code>arr.forEach(fn)</code>・<code>addEventListener('click', fn)</code><br><br>これらは全て<strong>高階関数</strong>です。関数（fn）を引数として受け取っています。知らないうちにすでに使いこなしていました！</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（コールバック関数）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// コールバック関数：引数として渡される関数</span>
+<span class="kw">const</span> <span class="fn">doOperation</span> = (a, b, callback) => {
+  <span class="kw">const</span> result = <span class="fn">callback</span>(a, b);
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`結果: </span><span class="cn">${{result}}</span><span class="cs">`</span>);
+};
+
+<span class="fn">doOperation</span>(<span class="cn">10</span>, <span class="cn">5</span>, (a, b) => a + b); <span class="cm">// 結果: 15</span>
+<span class="fn">doOperation</span>(<span class="cn">10</span>, <span class="cn">5</span>, (a, b) => a * b); <span class="cm">// 結果: 50</span>
+<span class="fn">doOperation</span>(<span class="cn">10</span>, <span class="cn">5</span>, (a, b) => a - b); <span class="cm">// 結果: 5</span>
+
+<span class="cm">// 配列のソートもコールバックで制御できる</span>
+<span class="kw">const</span> nums  = [<span class="cn">3</span>, <span class="cn">1</span>, <span class="cn">4</span>, <span class="cn">1</span>, <span class="cn">5</span>, <span class="cn">9</span>];
+<span class="kw">const</span> users = [
+  { name: <span class="cs">"太郎"</span>, age: <span class="cn">25</span> },
+  { name: <span class="cs">"花子"</span>, age: <span class="cn">22</span> },
+  { name: <span class="cs">"次郎"</span>, age: <span class="cn">28</span> },
+];
+
+nums.<span class="fn">sort</span>((a, b) => a - b);              <span class="cm">// 昇順 [1,1,3,4,5,9]</span>
+users.<span class="fn">sort</span>((a, b) => a.age - b.age);    <span class="cm">// 年齢昇順</span>
+users.<span class="fn">sort</span>((a, b) => b.age - a.age);    <span class="cm">// 年齢降順</span>
+users.<span class="fn">sort</span>((a, b) => a.name.<span class="fn">localeCompare</span>(b.name)); <span class="cm">// 名前順</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（関数を返す関数）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 関数を返す関数（ファクトリー関数）</span>
+<span class="kw">const</span> <span class="fn">createMultiplier</span> = (factor) => {
+  <span class="kw">return</span> (num) => num * factor; <span class="cm">// 関数を返す</span>
+};
+
+<span class="kw">const</span> double = <span class="fn">createMultiplier</span>(<span class="cn">2</span>);
+<span class="kw">const</span> triple = <span class="fn">createMultiplier</span>(<span class="cn">3</span>);
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">double</span>(<span class="cn">5</span>));  <span class="cm">// 10</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">triple</span>(<span class="cn">5</span>));  <span class="cm">// 15</span>
+
+<span class="cm">// 実用例：バリデーション関数を生成するファクトリー</span>
+<span class="kw">const</span> <span class="fn">createValidator</span> = (minLen, maxLen) => {
+  <span class="kw">return</span> (value) => value.length >= minLen && value.length <= maxLen;
+};
+
+<span class="kw">const</span> isValidName     = <span class="fn">createValidator</span>(<span class="cn">2</span>, <span class="cn">20</span>);
+<span class="kw">const</span> isValidPassword = <span class="fn">createValidator</span>(<span class="cn">8</span>, <span class="cn">50</span>);
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">isValidName</span>(<span class="cs">"太郎"</span>));       <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">isValidPassword</span>(<span class="cs">"abc"</span>));   <span class="cm">// false（短すぎ）</span></span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">コールバック地獄を避けるには</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">ネストを浅く保つ</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">コールバックが何重にも入れ子になる「コールバック地獄」は可読性を下げます。<br><br>対策①：関数を先に名前付きで定義してからコールバックに渡す<br>対策②：Promise・async/awaitで非同期のネストを解消する<br>対策③：処理を小さな関数に分割してネストを浅くする</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>コールバック地獄の例（ネストが深いコード）を一度見せると、「だからPromise/async/awaitが生まれた」という歴史的背景が理解できる。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">関数を引数として受け取る関数を何と呼ぶ？</div><div class="quiz-options"><div class="quiz-option wrong">コールバック関数</div><div class="quiz-option correct">高階関数 ✅</div><div class="quiz-option wrong">アロー関数</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">クロージャ・debounce・memoize</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「クロージャは関数が定義されたスコープの変数を記憶する仕組みです。最初は難しく感じますが、カウンターやキャッシュなど実用的なパターンで使われています。debounceは実務で必須のテクニックなので特に覚えておきましょう。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（クロージャ）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// クロージャ：内側の関数が外側の変数を「記憶」する</span>
+<span class="kw">const</span> <span class="fn">createCounter</span> = () => {
+  <span class="kw">let</span> count = <span class="cn">0</span>; <span class="cm">// この変数は返された関数に「記憶」される</span>
+  <span class="kw">return</span> {
+    increment: () => ++count,
+    decrement: () => --count,
+    reset:     () => { count = <span class="cn">0</span>; },
+    get:       () => count,
+  };
+};
+
+<span class="kw">const</span> counter = <span class="fn">createCounter</span>();
+<span class="fn">console</span>.<span class="fn">log</span>(counter.<span class="fn">increment</span>()); <span class="cm">// 1</span>
+<span class="fn">console</span>.<span class="fn">log</span>(counter.<span class="fn">increment</span>()); <span class="cm">// 2</span>
+<span class="fn">console</span>.<span class="fn">log</span>(counter.<span class="fn">decrement</span>()); <span class="cm">// 1</span>
+<span class="fn">console</span>.<span class="fn">log</span>(counter.<span class="fn">get</span>());        <span class="cm">// 1</span>
+
+<span class="cm">// 別のインスタンスはそれぞれ独立した count を持つ</span>
+<span class="kw">const</span> counter2 = <span class="fn">createCounter</span>();
+counter2.<span class="fn">increment</span>(); <span class="cm">// counter2は独立 → 1</span>
+<span class="fn">console</span>.<span class="fn">log</span>(counter.<span class="fn">get</span>());  <span class="cm">// counter は影響なし → 1</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（debounce：実務必須テクニック）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// debounce：連続して呼ばれても最後の呼び出しから一定時間後に1回だけ実行</span>
+<span class="cm">// 検索ボックス・リサイズイベントなどで必須</span>
+<span class="kw">const</span> <span class="fn">debounce</span> = (fn, delay) => {
+  <span class="kw">let</span> timer;
+  <span class="kw">return</span> (...args) => {
+    <span class="fn">clearTimeout</span>(timer);
+    timer = <span class="fn">setTimeout</span>(() => <span class="fn">fn</span>(...args), delay);
+  };
+};
+
+<span class="cm">// 使い方：検索ボックスへの入力（毎回APIを叩かないようにする）</span>
+<span class="kw">const</span> <span class="fn">searchAPI</span> = <span class="fn">debounce</span>((query) => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`"</span><span class="cn">${{query}}</span><span class="cs">"で検索`</span>);
+  <span class="cm">// ここでfetchする</span>
+}, <span class="cn">300</span>); <span class="cm">// 入力が止まって300ms後に実行</span>
+
+document.<span class="fn">querySelector</span>(<span class="cs">"#search"</span>)?.<span class="fn">addEventListener</span>(<span class="cs">"input"</span>, (e) => {
+  <span class="fn">searchAPI</span>(e.target.value); <span class="cm">// 連打してもAPI呼び出しは300ms後に1回</span>
+});</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">debounceとthrottleは混同されやすいです。<strong>debounce</strong>は「入力が止まってからN秒後に実行」（検索・バリデーションに使う）。<strong>throttle</strong>は「N秒間に最大1回実行」（スクロール・リサイズに使う）。どちらもパフォーマンス改善の重要テクニックです。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">createCounter関数を作り、increment・decrement・resetを持つオブジェクトを返すクロージャを実装しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">debounce関数を実装し、検索ボックスの入力に適用してコンソールで確認しよう（300ms後に1回だけ出力される）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>memoize関数を実装しよう（一度計算した結果をキャッシュして、同じ引数で呼ばれたときはキャッシュを返す）。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">コールバック関数として無名関数を渡せた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">関数を返す関数（ファクトリー）が書けた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">クロージャで状態を保持する関数が作れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">debounce関数の仕組みが理解できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第18回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第19回｜DOM操作応用・要素の生成と削除</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 19 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">DOM応用</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">DOM操作応用・要素の生成と削除<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">DocumentFragment・template要素・data属性・getBoundingClientRect</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>DocumentFragmentで高速挿入ができ、data属性でデータを管理し、getBoundingClientRectで要素の位置を取得できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">DOM応用の全体像を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">要素の生成・テンプレートリテラルでの挿入を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">data属性・座標取得・MutationObserverを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">要素の生成・挿入をマスターしよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">今回は要素の動的生成をより効率的に行う上級テクニックを学びます。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（DocumentFragmentで高速挿入）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 普通の方法：1つずつappendChildすると遅い</span>
+<span class="kw">const</span> ul = document.<span class="fn">querySelector</span>(<span class="cs">"#list"</span>);
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">100</span>; i++) {
+  <span class="kw">const</span> li = document.<span class="fn">createElement</span>(<span class="cs">"li"</span>);
+  li.textContent = <span class="cs">`アイテム </span><span class="cn">${{i + 1}}</span><span class="cs">`</span>;
+  ul.<span class="fn">appendChild</span>(li); <span class="cm">// 100回DOMを更新 → 遅い！</span>
+}
+
+<span class="cm">// DocumentFragmentを使う方法：1回でDOMに挿入</span>
+<span class="kw">const</span> fragment = document.<span class="fn">createDocumentFragment</span>();
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">100</span>; i++) {
+  <span class="kw">const</span> li = document.<span class="fn">createElement</span>(<span class="cs">"li"</span>);
+  li.textContent = <span class="cs">`アイテム </span><span class="cn">${{i + 1}}</span><span class="cs">`</span>;
+  fragment.<span class="fn">appendChild</span>(li); <span class="cm">// fragmentに追加（DOMは未更新）</span>
+}
+ul.<span class="fn">appendChild</span>(fragment); <span class="cm">// 最後に1回だけDOMを更新 → 速い！</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（template要素で雛形を使いまわす）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">&lt;!-- HTML側にtemplate要素を定義 --&gt;</span>
+<span class="cm">&lt;template id="card-template"&gt;
+  &lt;div class="card"&gt;
+    &lt;h2 class="card-title"&gt;&lt;/h2&gt;
+    &lt;p class="card-body"&gt;&lt;/p&gt;
+    &lt;button class="card-btn"&gt;詳細を見る&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</span>
+
+<span class="cm">// template要素をJSでクローンして使う</span>
+<span class="kw">const</span> tmpl      = document.<span class="fn">querySelector</span>(<span class="cs">"#card-template"</span>);
+<span class="kw">const</span> container = document.<span class="fn">querySelector</span>(<span class="cs">"#cards"</span>);
+
+<span class="kw">const</span> items = [
+  { title: <span class="cs">"カード1"</span>, body: <span class="cs">"説明文1"</span> },
+  { title: <span class="cs">"カード2"</span>, body: <span class="cs">"説明文2"</span> },
+];
+
+items.<span class="fn">forEach</span>(item => {
+  <span class="kw">const</span> clone = tmpl.content.<span class="fn">cloneNode</span>(<span class="ck">true</span>); <span class="cm">// 深いコピー</span>
+  clone.<span class="fn">querySelector</span>(<span class="cs">".card-title"</span>).textContent = item.title;
+  clone.<span class="fn">querySelector</span>(<span class="cs">".card-body"</span>).textContent  = item.body;
+  container.<span class="fn">appendChild</span>(clone);
+});</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">insertAdjacentHTML vs createElement</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">使い分けの基準</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><strong>insertAdjacentHTML</strong>：HTMLを文字列でまとめて挿入したいとき。テンプレートリテラルと相性が良い。XSSに注意（ユーザー入力を入れない）。<br><br><strong>createElement</strong>：要素1つ1つをJSで組み立てるとき。XSSリスクがない。イベントリスナーをすぐ付けたいとき。<br><br><strong>template要素</strong>：同じHTML構造を何度も使いまわすとき。デザイナー・マークアップエンジニアとの分業に向く。</div>
+</div>
+
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">data属性・座標取得・MutationObserver</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">data属性で要素にデータを持たせ、getBoundingClientRectで位置・サイズを取得できます。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（data属性）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">&lt;!-- HTML側でdata-*属性を定義 --&gt;</span>
+<span class="cm">&lt;button class="product-btn"
+        data-id="42"
+        data-name="ノートPC"
+        data-price="98000"&gt;
+  カートに追加
+&lt;/button&gt;</span>
+
+<span class="cm">// JSでdata属性を取得・設定する</span>
+<span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="cs">".product-btn"</span>);
+
+<span class="cm">// datasetプロパティ経由でアクセス（data-を除いたキャメルケース）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(btn.dataset.id);      <span class="cm">// "42"（文字列）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(btn.dataset.name);    <span class="cm">// "ノートPC"</span>
+<span class="fn">console</span>.<span class="fn">log</span>(btn.dataset.price);   <span class="cm">// "98000"</span>
+
+<span class="cm">// 数値が必要なときは変換する</span>
+<span class="kw">const</span> productId = <span class="fn">Number</span>(btn.dataset.id); <span class="cm">// 42</span>
+
+<span class="cm">// data属性を設定・削除</span>
+btn.dataset.quantity = <span class="cs">"1"</span>;    <span class="cm">// 設定</span>
+<span class="kw">delete</span> btn.dataset.quantity;    <span class="cm">// 削除</span></span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（getBoundingClientRect・ポジション計算）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// getBoundingClientRect：要素のサイズと位置を取得</span>
+<span class="kw">const</span> el   = document.<span class="fn">querySelector</span>(<span class="cs">".target"</span>);
+<span class="kw">const</span> rect = el.<span class="fn">getBoundingClientRect</span>();
+
+<span class="fn">console</span>.<span class="fn">log</span>(rect.top);    <span class="cm">// ビューポート上端からの距離</span>
+<span class="fn">console</span>.<span class="fn">log</span>(rect.left);   <span class="cm">// ビューポート左端からの距離</span>
+<span class="fn">console</span>.<span class="fn">log</span>(rect.width);  <span class="cm">// 要素の幅</span>
+<span class="fn">console</span>.<span class="fn">log</span>(rect.height); <span class="cm">// 要素の高さ</span>
+<span class="fn">console</span>.<span class="fn">log</span>(rect.bottom); <span class="cm">// ビューポート上端からの距離 + 高さ</span>
+
+<span class="cm">// ビューポート内に表示されているか判定</span>
+<span class="kw">const</span> <span class="fn">isVisible</span> = (element) => {
+  <span class="kw">const</span> r = element.<span class="fn">getBoundingClientRect</span>();
+  <span class="kw">return</span> r.top >= <span class="cn">0</span> &&
+         r.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+};
+
+<span class="cm">// ツールチップの位置をボタンの位置に合わせる例</span>
+btn.<span class="fn">addEventListener</span>(<span class="cs">"mouseenter"</span>, () => {
+  <span class="kw">const</span> r = btn.<span class="fn">getBoundingClientRect</span>();
+  tooltip.style.top  = <span class="cs">`</span><span class="cn">${{r.bottom + window.scrollY + 8}}</span><span class="cs">px`</span>;
+  tooltip.style.left = <span class="cs">`</span><span class="cn">${{r.left + window.scrollX}}</span><span class="cs">px`</span>;
+  tooltip.classList.<span class="fn">add</span>(<span class="cs">"show"</span>);
+});</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">getBoundingClientRectの座標はビューポート基準です。ページ全体の絶対位置を得るには <code>rect.top + window.scrollY</code> を使います。スクロール量を足すのを忘れると、スクロール後にズレます。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">HTML要素に独自データを持たせるHTML属性は？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">class属性</div><div class="quiz-option" onclick="answer(this,true)">data-* 属性</div><div class="quiz-option" onclick="answer(this,false)">id属性</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">商品データの配列（id・name・price）をmap()でカード要素として画面に表示し、各カードにdata-idを持たせよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>イベントデリゲーションとdata属性を組み合わせて、クリックされた商品のidをconsole.logで表示しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>ボタンにhoverしたときにツールチップを表示するUIをgetBoundingClientRectで位置合わせして作ろう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">DocumentFragmentで大量要素を効率よく挿入できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">data属性でHTML要素にデータを持たせられた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">dataset経由でdata属性を取得・設定できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">getBoundingClientRectで要素の位置・サイズを取得できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第19回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第11回｜非同期処理を理解しよう①</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 11 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">非同期①</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">非同期処理を理解しよう①<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">同期・非同期・setTimeout・setInterval・Promise・then/catch</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>同期と非同期の実行順序の違いを理解し、setTimeout/setIntervalとPromiseの.then()/.catch()が使えるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">同期・非同期処理の概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">setTimeout・setIntervalを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">Promiseの基本を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">同期処理と非同期処理の違い</div>
+<div class="sec-time">0〜15分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">非同期処理は時間のかかる処理を待たずに次の処理を進め、完了後に結果を受け取る仕組みです。</div></div>
+<div class="intro-box">
+<div class="intro-icon">⏱</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">同期と非同期のイメージ</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><strong>同期処理</strong>（順番待ち）：ラーメン屋でカウンター注文。作り終わるまで次の人は注文できない。<br><br><strong>非同期処理</strong>（並行）：ファミレスで注文。注文したらすぐ次のお客さんの注文を取り、できた料理を後から届ける。<br><br>APIのデータ取得・ファイルの読み込み・タイマー処理などは全て非同期で行います。</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（同期 vs 非同期）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 同期処理：上から順番に実行される</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"① 最初"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"② 次"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"③ 最後"</span>);
+<span class="cm">// → ① ② ③ の順に表示</span>
+
+
+<span class="cm">// 非同期処理：setTimeoutは後回しにされる</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"① 最初"</span>);
+
+<span class="fn">setTimeout</span>(() => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"② 1秒後"</span>); <span class="cm">// 1000ms後に実行</span>
+}, <span class="cn">1000</span>);
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"③ すぐ実行"</span>);
+<span class="cm">// → ① ③ ② の順に表示！（②は後回し）</span></div>
+</div>
+
+
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">setTimeout・setInterval</div>
+<div class="sec-time">15〜30分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">setTimeoutで遅延実行、setIntervalで繰り返し実行ができます。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（setTimeout・setInterval）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// setTimeout：指定時間後に1回だけ実行</span>
+<span class="kw">const</span> timerId = <span class="fn">setTimeout</span>(() => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"3秒経ちました！"</span>);
+}, <span class="cn">3000</span>); <span class="cm">// 3000ms = 3秒</span>
+
+<span class="cm">// キャンセルしたい場合</span>
+<span class="fn">clearTimeout</span>(timerId);
+
+
+<span class="cm">// setInterval：一定間隔で繰り返し実行</span>
+<span class="kw">let</span> count = <span class="cn">0</span>;
+<span class="kw">const</span> intervalId = <span class="fn">setInterval</span>(() => {
+  count++;
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`</span><span class="cn">${{count}}</span><span class="cs">秒経過`</span>);
+
+  <span class="kw">if</span> (count >= <span class="cn">5</span>) {
+    <span class="fn">clearInterval</span>(intervalId); <span class="cm">// 5回で停止</span>
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"カウント終了！"</span>);
+  }
+}, <span class="cn">1000</span>);
+
+
+<span class="cm">// 実践例：カウントダウンタイマー</span>
+<span class="kw">const</span> display = document.<span class="fn">querySelector</span>(<span class="cs">"#timer"</span>);
+<span class="kw">let</span> remaining = <span class="cn">10</span>;
+
+<span class="kw">const</span> timer = <span class="fn">setInterval</span>(() => {
+  display.textContent = remaining;
+  remaining--;
+  <span class="kw">if</span> (remaining < <span class="cn">0</span>) {
+    <span class="fn">clearInterval</span>(timer);
+    display.textContent = <span class="cs">"終了！"</span>;
+  }
+}, <span class="cn">1000</span>);</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">setTimeoutとsetIntervalの使い分け</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">1回か繰り返しかで選ぶ</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><strong>setTimeout</strong>：一定時間後に1回だけ実行<br>使い道：通知を数秒後に消す・ローディング後に画面を表示する<br><br><strong>setInterval</strong>：一定間隔で繰り返し実行<br>使い道：カウントダウン・スライダーの自動再生・時計の表示<br><br>どちらも<strong>clearTimeout/clearInterval</strong>で止めることを忘れずに！</div>
+</div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">1秒ごとに繰り返し処理を実行するには？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">setTimeout</div><div class="quiz-option" onclick="answer(this,true)">setInterval</div><div class="quiz-option" onclick="answer(this,false)">setLoop</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">3</div>
+<div class="sec-title">Promiseの基本</div>
+<div class="sec-time">30〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">Promiseは非同期処理の完了・失敗を扱うオブジェクトです。.then()/.catch()で結果を受け取ります。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（Promiseの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// Promiseを作る（resolve=成功・reject=失敗）</span>
+<span class="kw">const</span> fetchData = () => {
+  <span class="kw">return new</span> <span class="fn">Promise</span>((resolve, reject) => {
+    <span class="fn">setTimeout</span>(() => {
+      <span class="kw">const</span> success = <span class="ck">true</span>; <span class="cm">// 成功シミュレーション</span>
+      <span class="kw">if</span> (success) {
+        resolve({ name: <span class="cs">"田中"</span>, age: <span class="cn">25</span> }); <span class="cm">// 成功：データを返す</span>
+      } <span class="kw">else</span> {
+        reject(<span class="kw">new</span> <span class="fn">Error</span>(<span class="cs">"取得失敗"</span>));       <span class="cm">// 失敗：エラーを返す</span>
+      }
+    }, <span class="cn">1000</span>);
+  });
+};
+
+<span class="cm">// Promiseを使う（.then()で成功・.catch()で失敗を処理）</span>
+<span class="fn">fetchData</span>()
+  .<span class="fn">then</span>(data => {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"成功："</span>, data); <span class="cm">// {name:"田中", age:25}</span>
+  })
+  .<span class="fn">catch</span>(error => {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"エラー："</span>, error.message);
+  })
+  .<span class="fn">finally</span>(() => {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"成功・失敗に関わらず実行"</span>); <span class="cm">// ローディング解除など</span>
+  });</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">Promiseには3つの状態があります。<strong>pending</strong>（処理中）→ <strong>fulfilled</strong>（成功）または <strong>rejected</strong>（失敗）。一度fulfilled/rejectedになると状態は変わりません。.finally()は成功・失敗どちらでも実行されるので、ローディング表示の解除などに使います。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">setIntervalを使って1秒ごとにカウントアップする時計を作ろう（現在時刻をgetHours/getMinutes/getSecondsで取得）。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>「スタート」「ストップ」ボタンで制御できるカウントダウンタイマーを作ろう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>成功/失敗をランダムに返すPromiseを作り、.then()/.catch()で結果を画面に表示しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">同期処理と非同期処理の実行順序の違いが理解できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">setTimeoutで遅延実行が実装できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">setIntervalで繰り返し処理が実装できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">Promiseの.then()/.catch()で結果を受け取れた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第11回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

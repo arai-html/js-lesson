@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第17回｜エラーハンドリング</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 17 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">応用⑤</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">エラーハンドリング<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">try/catch/finally・throw・カスタムエラー・デバッグ術</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>try/catch/finallyでエラーを適切に処理し、throwで意図的にエラーを発生させ、カスタムエラークラスが作れるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">エラーの種類と仕組みを説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">try/catch/finally・throwを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">カスタムエラー・デバッグ術を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">エラーの種類とtry/catchを理解しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">try/catchはエラーが発生しても処理を止めずに適切に対処するための構文です。</div></div>
+<div class="intro-box">
+<div class="intro-icon">🐛</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">JavaScriptの主なエラーの種類</div>
+<div style="font-size:14px;line-height:1.8;color:#555;"><strong>SyntaxError</strong>：構文エラー。スペルミス・括弧の対応ミスなど。コードが実行される前に発生。<br><strong>ReferenceError</strong>：定義されていない変数を参照したとき。<br><strong>TypeError</strong>：値の型が期待と異なるとき（nullのプロパティを参照するなど）。<br><strong>RangeError</strong>：値が有効な範囲外のとき（配列の長さに負の値など）。<br><strong>NetworkError</strong>：fetch失敗など通信エラー。</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（try/catch/finally）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// try：エラーが起きるかもしれない処理を囲む</span>
+<span class="cm">// catch：エラーが起きたときに実行される</span>
+<span class="cm">// finally：成功・失敗に関わらず必ず実行される</span>
+
+<span class="kw">try</span> {
+  <span class="kw">const</span> data = <span class="fn">JSON</span>.<span class="fn">parse</span>(<span class="cs">'{"name": "太郎"}'</span>); <span class="cm">// 正常</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(data.name);
+
+  <span class="kw">const</span> broken = <span class="fn">JSON</span>.<span class="fn">parse</span>(<span class="cs">'不正なJSON'</span>);     <span class="cm">// ← エラー発生</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"これは表示されない"</span>);
+
+} <span class="kw">catch</span> (error) {
+  <span class="cm">// errorオブジェクトには情報が詰まっている</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(error.name);    <span class="cm">// "SyntaxError"</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(error.message); <span class="cm">// エラーの詳細メッセージ</span>
+
+} <span class="kw">finally</span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"finallyは必ず実行される"</span>);
+  <span class="cm">// ローディング解除・リソースの後片付けに使う</span>
+}</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（throwで意図的にエラーを発生させる）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// throwで自分でエラーを投げられる</span>
+<span class="kw">const</span> <span class="fn">divide</span> = (a, b) => {
+  <span class="kw">if</span> (b === <span class="cn">0</span>) {
+    <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="cs">"0で割ることはできません"</span>);
+  }
+  <span class="kw">return</span> a / b;
+};
+
+<span class="kw">try</span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">divide</span>(<span class="cn">10</span>, <span class="cn">2</span>));  <span class="cm">// 5</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="fn">divide</span>(<span class="cn">10</span>, <span class="cn">0</span>));  <span class="cm">// ← throwされる</span>
+} <span class="kw">catch</span> (error) {
+  <span class="fn">console</span>.<span class="fn">log</span>(error.message); <span class="cm">// "0で割ることはできません"</span>
+}
+
+<span class="cm">// 文字列・数値・オブジェクトも throw できる</span>
+<span class="kw">throw</span> { code: <span class="cn">404</span>, message: <span class="cs">"Not Found"</span> };</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">try/catchを使うべき場面</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">全部囲めばいいわけではない</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;">✅ <strong>使うべき場面</strong>：外部からのデータ（API・JSON・ユーザー入力）を扱うとき、ファイル操作やDB処理、外部ライブラリの呼び出し。<br><br>❌ <strong>使わなくていい場面</strong>：自分が完全にコントロールしている計算処理、エラーが起きえないシンプルな関数。<br><br>「エラーが起きる可能性がある場所だけ囲む」が原則です。</div>
+</div>
+
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">try/catchのfinallyブロックはいつ実行される？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">tryが成功したとき</div><div class="quiz-option" onclick="answer(this,false)">エラーが起きたとき</div><div class="quiz-option" onclick="answer(this,true)">成功・失敗に関わらず必ず</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">カスタムエラー・デバッグ術</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">カスタムエラークラスと便利なデバッグ手法を覚えましょう。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（カスタムエラークラス）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// Errorを継承してカスタムエラーを作る</span>
+<span class="kw">class</span> <span class="fn">ValidationError</span> <span class="kw">extends</span> <span class="fn">Error</span> {
+  <span class="fn">constructor</span>(message, field) {
+    <span class="kw">super</span>(message);
+    <span class="ck">this</span>.name  = <span class="cs">"ValidationError"</span>;
+    <span class="ck">this</span>.field = field;
+  }
+}
+
+<span class="kw">class</span> <span class="fn">NetworkError</span> <span class="kw">extends</span> <span class="fn">Error</span> {
+  <span class="fn">constructor</span>(message, status) {
+    <span class="kw">super</span>(message);
+    <span class="ck">this</span>.name   = <span class="cs">"NetworkError"</span>;
+    <span class="ck">this</span>.status = status;
+  }
+}
+
+<span class="cm">// instanceof でエラーの種類を判別して処理を分岐</span>
+<span class="kw">try</span> {
+  <span class="kw">throw new</span> <span class="fn">ValidationError</span>(<span class="cs">"メールアドレスが不正です"</span>, <span class="cs">"email"</span>);
+} <span class="kw">catch</span> (error) {
+  <span class="kw">if</span> (error <span class="kw">instanceof</span> <span class="fn">ValidationError</span>) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`バリデーションエラー [</span><span class="cn">${{error.field}}</span><span class="cs">]: </span><span class="cn">${{error.message}}</span><span class="cs">`</span>);
+  } <span class="kw">else if</span> (error <span class="kw">instanceof</span> <span class="fn">NetworkError</span>) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`通信エラー (</span><span class="cn">${{error.status}}</span><span class="cs">): </span><span class="cn">${{error.message}}</span><span class="cs">`</span>);
+  } <span class="kw">else</span> {
+    <span class="kw">throw</span> error; <span class="cm">// 想定外のエラーは再度throwする</span>
+  }
+}</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（デバッグに使えるconsoleメソッド）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// console.log    → 通常の出力</span>
+<span class="cm">// console.error  → 赤いエラー表示</span>
+<span class="cm">// console.warn   → 黄色い警告表示</span>
+<span class="cm">// console.table  → 配列・オブジェクトを表形式で表示</span>
+<span class="cm">// console.group  → グループ化して折りたためる</span>
+<span class="cm">// console.time   → 処理時間を計測</span>
+
+<span class="kw">const</span> users = [
+  { name: <span class="cs">"太郎"</span>, age: <span class="cn">25</span> },
+  { name: <span class="cs">"花子"</span>, age: <span class="cn">22</span> }
+];
+<span class="fn">console</span>.<span class="fn">table</span>(users); <span class="cm">// 表形式で見やすく表示</span>
+
+<span class="cm">// 処理時間を計測</span>
+<span class="fn">console</span>.<span class="fn">time</span>(<span class="cs">"処理時間"</span>);
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">100000</span>; i++) {} <span class="cm">// 何か処理</span>
+<span class="fn">console</span>.<span class="fn">timeEnd</span>(<span class="cs">"処理時間"</span>); <span class="cm">// "処理時間: Xms"</span>
+
+<span class="cm">// グループ化</span>
+<span class="fn">console</span>.<span class="fn">group</span>(<span class="cs">"ユーザー情報"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"名前: 太郎"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"年齢: 25"</span>);
+<span class="fn">console</span>.<span class="fn">groupEnd</span>();</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">デベロッパーツールの<strong>Sourcesタブ</strong>でブレークポイントを設定すると、コードを1行ずつ実行して変数の中身を確認できます。console.logだらけのデバッグより遥かに効率的です。ぜひ習慣にしましょう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">JSONをパースする関数をtry/catchで囲み、不正なJSON文字列を渡したときにエラーメッセージを表示しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">入力バリデーション用のValidationErrorクラスを作り、フォームの送信処理でthrow/catchを使ってエラーを表示しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>fetch処理をtry/catchで囲み、ネットワークエラー・HTTPエラー・JSONパースエラーをそれぞれ別のメッセージで表示しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">try/catch/finallyの書き方が理解できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">throwで意図的にエラーを発生させられた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">カスタムエラークラスが作れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">instanceofでエラーの種類を判別できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第17回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

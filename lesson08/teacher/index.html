@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第08回｜DOMを操作しよう①</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 08 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">DOM①</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">DOMを操作しよう①<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">querySelector・textContent・innerHTML・classList・style</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>querySelector/Allで要素を取得し、textContent・classList.toggleを使ってUIをJSで動かせるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">DOMとは何かを説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">要素の取得・テキスト・属性の変更を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">クラスの追加・削除・スタイル操作を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">DOMを取得して中身を変えよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「DOMとはDocument Object Modelの略で、HTMLをJavaScriptから操作するための仕組みです。ブラウザはHTMLを読み込むとDOMツリーを作り、JavaScriptはそのツリーを通してHTMLの要素を取得・変更・追加・削除できます。」</div></div>
+<div class="intro-box">
+<div class="intro-icon">🌐</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">DOMで何ができる？</div>
+<div style="font-size:14px;line-height:1.8;color:#555;">• テキストや画像を書き換える<br>• クラスを追加・削除してスタイルを切り替える<br>• 新しい要素を作って追加する<br>• 要素を削除する<br>• イベント（クリック・入力など）を検知して処理する</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（要素の取得）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// querySelector：CSSセレクタで1つ取得</span>
+<span class="kw">const</span> title  = document.<span class="fn">querySelector</span>(<span class="cs">"h1"</span>);
+<span class="kw">const</span> btn    = document.<span class="fn">querySelector</span>(<span class="cs">"#submit-btn"</span>);
+<span class="kw">const</span> card   = document.<span class="fn">querySelector</span>(<span class="cs">".card"</span>);
+
+<span class="cm">// querySelectorAll：条件に一致する全要素をNodeListで取得</span>
+<span class="kw">const</span> items  = document.<span class="fn">querySelectorAll</span>(<span class="cs">".item"</span>);
+<span class="kw">const</span> links  = document.<span class="fn">querySelectorAll</span>(<span class="cs">"a"</span>);
+
+<span class="cm">// 取得できたか確認（nullチェックは必須！）</span>
+<span class="fn">console</span>.<span class="fn">log</span>(btn);          <span class="cm">// 要素オブジェクト or null</span>
+<span class="fn">console</span>.<span class="fn">log</span>(items.length); <span class="cm">// 取得できた要素数</span>
+
+<span class="cm">// NodeListにはforEachが使える</span>
+items.<span class="fn">forEach</span>(item => {
+  <span class="fn">console</span>.<span class="fn">log</span>(item.textContent);
+});</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（テキスト・HTML・属性の変更）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> title = document.<span class="fn">querySelector</span>(<span class="cs">"#title"</span>);
+<span class="kw">const</span> link  = document.<span class="fn">querySelector</span>(<span class="cs">"a"</span>);
+<span class="kw">const</span> img   = document.<span class="fn">querySelector</span>(<span class="cs">"img"</span>);
+
+<span class="cm">// テキストを変える（HTMLタグはそのまま文字列になる・安全）</span>
+title.textContent = <span class="cs">"新しいタイトル"</span>;
+
+<span class="cm">// HTMLごと変える（タグが有効になる・XSSに注意）</span>
+title.innerHTML = <span class="cs">"&lt;span&gt;タイトル&lt;/span&gt;"</span>;
+
+<span class="cm">// 属性を取得・変更</span>
+<span class="fn">console</span>.<span class="fn">log</span>(link.<span class="fn">getAttribute</span>(<span class="cs">"href"</span>));    <span class="cm">// 現在のhref</span>
+link.<span class="fn">setAttribute</span>(<span class="cs">"href"</span>, <span class="cs">"https://example.com"</span>);
+link.<span class="fn">setAttribute</span>(<span class="cs">"target"</span>, <span class="cs">"_blank"</span>);
+
+<span class="cm">// src・alt などはプロパティで直接変更できる</span>
+img.src = <span class="cs">"new-image.jpg"</span>;
+img.alt = <span class="cs">"新しい画像"</span>;</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">textContent vs innerHTML</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">使い分けが重要</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><code>textContent</code>：テキストとして扱う。HTMLタグも文字列になる。<strong>ユーザー入力を表示するときは必ずこちら</strong>（XSS対策）<br><br><code>innerHTML</code>：HTMLとして解釈する。タグが有効になる。自分で書いた静的なHTMLを挿入するときに使う。</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>innerHTMLのXSSリスクは必ず伝える。「ユーザーが入力した値はinnerHTMLに絶対入れない」というルールを早い段階で植え付ける。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">クラス操作・スタイル変更</div>
+<div class="sec-time">25〜40分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「JavaScriptからCSSを直接変えるより、クラスを追加・削除することでスタイルを切り替える方法が実務の基本です。CSSに.activeや.openといったクラスのスタイルを定義しておき、JSでそのクラスを付けたり外したりします。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（クラス操作）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="cs">"#btn"</span>);
+<span class="kw">const</span> box = document.<span class="fn">querySelector</span>(<span class="cs">".box"</span>);
+
+<span class="cm">// クラスを追加・削除・トグル・確認</span>
+box.classList.<span class="fn">add</span>(<span class="cs">"active"</span>);       <span class="cm">// 追加</span>
+box.classList.<span class="fn">remove</span>(<span class="cs">"active"</span>);    <span class="cm">// 削除</span>
+box.classList.<span class="fn">toggle</span>(<span class="cs">"active"</span>);    <span class="cm">// あれば削除・なければ追加</span>
+box.classList.<span class="fn">contains</span>(<span class="cs">"active"</span>); <span class="cm">// 持っているか → true/false</span>
+
+<span class="cm">// ボタンクリックでトグル（実務の基本パターン）</span>
+btn.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, () => {
+  box.classList.<span class="fn">toggle</span>(<span class="cs">"open"</span>);
+  btn.textContent = box.classList.<span class="fn">contains</span>(<span class="cs">"open"</span>) ? <span class="cs">"閉じる"</span> : <span class="cs">"開く"</span>;
+});</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（スタイルを直接変更）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> box = document.<span class="fn">querySelector</span>(<span class="cs">".box"</span>);
+
+<span class="cm">// style プロパティで直接変更（CSSプロパティはキャメルケース）</span>
+box.style.backgroundColor = <span class="cs">"#f7df1e"</span>; <span class="cm">// background-color → backgroundColor</span>
+box.style.fontSize        = <span class="cs">"20px"</span>;
+box.style.display         = <span class="cs">"none"</span>;    <span class="cm">// 非表示</span>
+box.style.display         = <span class="cs">""</span>;         <span class="cm">// 元に戻す（スタイルを削除）</span>
+
+<span class="cm">// 現在のスタイルを取得（getComputedStyleを使う）</span>
+<span class="kw">const</span> computed = <span class="fn">getComputedStyle</span>(box);
+<span class="fn">console</span>.<span class="fn">log</span>(computed.backgroundColor);
+<span class="fn">console</span>.<span class="fn">log</span>(computed.width);</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">スタイルを直接変えるより<strong>クラスを切り替える方が推奨</strong>されます。理由はデザインの管理をCSSに任せられるため。JSはクラスを付けるだけ、見た目の詳細はCSSで定義——この役割分担が保守しやすいコードを作ります。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">クラスの追加・削除を切り替える（あれば削除・なければ追加）メソッドは？</div><div class="quiz-options"><div class="quiz-option wrong">classList.add()</div><div class="quiz-option correct">classList.toggle() ✅</div><div class="quiz-option wrong">classList.switch()</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">40〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">ボタンをクリックするたびに背景色が変わるUIを作ろう（classList.toggleとCSSクラスを使う）。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">テキストボックスに入力した文字をリアルタイムでh1タグに反映させよう（inputイベント＋textContent）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>ダークモード切り替えボタンを作ろう。bodyにdarkクラスを付け外しして、CSSで背景色と文字色を切り替える。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">querySelector/querySelectorAllで要素を取得できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">textContentとinnerHTMLの違いが説明できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">classList.add/remove/toggleが使えた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">ボタンクリックでクラスを切り替えるUIが作れた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第08回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

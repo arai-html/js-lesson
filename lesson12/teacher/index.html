@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第12回｜非同期処理を理解しよう②</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 12 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">非同期②</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">非同期処理を理解しよう②<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">async・await・try/catch・fetch・JSON</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>async/awaitでPromiseをスッキリ書け、fetchとawait response.json()で外部APIからデータを取得・表示できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">async/awaitの概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">async/awaitの書き方を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">fetchでAPIからデータを取得する</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">async/awaitをマスターしよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「async/awaitはPromiseをより読みやすく書けるES2017の構文です。非同期処理なのに見た目は同期処理と同じような書き方になります。現代のJavaScriptではPromiseの.then()より圧倒的にasync/awaitが使われます。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（async/awaitの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 前回のPromiseをasync/awaitで書き直す</span>
+
+<span class="cm">// Promiseを返す関数（変更なし）</span>
+<span class="kw">const</span> <span class="fn">fetchData</span> = () => {
+  <span class="kw">return new</span> <span class="fn">Promise</span>((resolve) => {
+    <span class="fn">setTimeout</span>(() => resolve({ name: <span class="cs">"田中"</span>, age: <span class="cn">25</span> }), <span class="cn">1000</span>);
+  });
+};
+
+<span class="cm">// .then()で書いた場合</span>
+<span class="fn">fetchData</span>().<span class="fn">then</span>(data => <span class="fn">console</span>.<span class="fn">log</span>(data));
+
+<span class="cm">// async/awaitで書いた場合（より読みやすい！）</span>
+<span class="kw">const</span> <span class="fn">getData</span> = <span class="kw">async</span> () => {
+  <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">fetchData</span>(); <span class="cm">// Promiseが解決するまで待つ</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(data);              <span class="cm">// {name:"田中", age:25}</span>
+};
+<span class="fn">getData</span>();</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（try/catchでエラーハンドリング）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> <span class="fn">loadUser</span> = <span class="kw">async</span> () => {
+
+  <span class="kw">try</span> {
+    <span class="cm">// ローディング開始</span>
+    document.<span class="fn">querySelector</span>(<span class="cs">"#loading"</span>).style.display = <span class="cs">"block"</span>;
+
+    <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">fetchData</span>();   <span class="cm">// 成功したらdataに入る</span>
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"取得成功："</span>, data);
+
+  } <span class="kw">catch</span> (error) {
+    <span class="cm">// エラーが起きたらここで受け取る</span>
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"エラー："</span>, error.message);
+
+  } <span class="kw">finally</span> {
+    <span class="cm">// 成功・失敗どちらでもローディングを解除</span>
+    document.<span class="fn">querySelector</span>(<span class="cs">"#loading"</span>).style.display = <span class="cs">"none"</span>;
+  }
+
+};
+<span class="fn">loadUser</span>();</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">awaitはasyncの中でしか使えない</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">最重要ルール</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><code>await</code> は <code>async</code> と宣言した関数の中でしか使えません。<br><br>✅ <code>const fn = async () => {{ const data = await fetchData(); }}</code><br>❌ <code>const data = await fetchData();</code>（asyncなし → エラー）<br><br>「awaitを使いたい → async関数を作る」という流れで覚えましょう。</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>async/awaitはPromiseのシンタックスシュガーであることを伝える。裏では同じPromiseが動いている。デバッグのときにPromiseを理解しておくと役立つと伝える。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">awaitキーワードはどこで使える？</div><div class="quiz-options"><div class="quiz-option wrong">どこでも使える</div><div class="quiz-option correct">async関数の中だけ ✅</div><div class="quiz-option wrong">Promiseの中だけ</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">fetchでAPIからデータを取得しよう</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「fetchはブラウザ標準のAPIで、外部のURLにリクエストを送ってデータを取得できます。JSONPlaceholderという練習用のAPIを使って、実際にデータを取得して画面に表示するまでをやります。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（fetchの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// fetch：URLにリクエストを送る</span>
+<span class="kw">const</span> <span class="fn">getUsers</span> = <span class="kw">async</span> () => {
+  <span class="kw">try</span> {
+    <span class="cm">// ① fetchでリクエスト（レスポンスオブジェクトが返る）</span>
+    <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(
+      <span class="cs">"https://jsonplaceholder.typicode.com/users"</span>
+    );
+
+    <span class="cm">// ② レスポンスが成功かチェック</span>
+    <span class="kw">if</span> (!response.ok) {
+      <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="cs">`HTTPエラー: </span><span class="cn">${{response.status}}</span><span class="cs">`</span>);
+    }
+
+    <span class="cm">// ③ JSONに変換（これも非同期なのでawaitが必要）</span>
+    <span class="kw">const</span> users = <span class="kw">await</span> response.<span class="fn">json</span>();
+    <span class="fn">console</span>.<span class="fn">log</span>(users); <span class="cm">// ユーザーの配列</span>
+
+    <span class="cm">// ④ 画面に表示</span>
+    <span class="kw">const</span> list = document.<span class="fn">querySelector</span>(<span class="cs">"#user-list"</span>);
+    list.innerHTML = users.<span class="fn">map</span>(user => <span class="cs">`
+      &lt;li&gt;
+        &lt;strong&gt;</span><span class="cn">${{user.name}}</span><span class="cs">&lt;/strong&gt;
+        &lt;span&gt;</span><span class="cn">${{user.email}}</span><span class="cs">&lt;/span&gt;
+      &lt;/li&gt;
+    `</span>).<span class="fn">join</span>(<span class="cs">""</span>);
+
+  } <span class="kw">catch</span> (error) {
+    <span class="fn">console</span>.<span class="fn">error</span>(<span class="cs">"取得失敗："</span>, error);
+    document.<span class="fn">querySelector</span>(<span class="cs">"#user-list"</span>).innerHTML =
+      <span class="cs">"&lt;li&gt;データの取得に失敗しました&lt;/li&gt;"</span>;
+  }
+};
+
+<span class="fn">getUsers</span>();</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;"><strong>fetchの2段階のawait</strong>を忘れずに。<br>① <code>await fetch(url)</code> → レスポンスオブジェクトを受け取る<br>② <code>await response.json()</code> → JSONを解析してJSオブジェクトに変換する<br><br>この2ステップは毎回必要です。セットで覚えましょう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">JSONPlaceholderのposts（https://jsonplaceholder.typicode.com/posts）からデータを取得して、タイトル一覧を画面に表示しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>データ取得中は「読み込み中...」と表示し、完了後に非表示にするローディング演出を追加しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>slice(0, 5)で最初の5件だけ表示し、「もっと見る」ボタンで5件ずつ追加表示できるようにしよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">async関数とawaitの書き方が理解できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">try/catchでエラーハンドリングができた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">fetchで外部APIからデータを取得できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">取得したデータをmap()で画面に表示できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第12回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

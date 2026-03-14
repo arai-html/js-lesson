@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第16回｜正規表現を使ってみよう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 16 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">応用④</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">正規表現を使ってみよう<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">正規表現・test()・match()・replace()・フォームバリデーション</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>正規表現の基本パターンが書け、test()でバリデーション判定を行い、フォームにリアルタイムバリデーションが実装できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">正規表現の概念と用途を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">正規表現の基本パターンを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">フォームバリデーションへの応用を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">正規表現の基本を覚えよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「正規表現は文字列のパターンを表す記法です。メールアドレスの形式チェック・電話番号の抽出・テキストの置換など、文字列操作の強力なツールです。最初は記号だらけで怖いですが、よく使うパターンを5〜6個覚えれば実務の8割はこなせます。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（正規表現の基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 正規表現リテラル：/パターン/フラグ</span>
+<span class="kw">const</span> pattern = <span class="cn">/hello/</span>;         <span class="cm">// "hello"にマッチ</span>
+<span class="kw">const</span> patternI = <span class="cn">/hello/i</span>;        <span class="cm">// 大文字小文字を無視（フラグi）</span>
+<span class="kw">const</span> patternG = <span class="cn">/hello/g</span>;        <span class="cm">// 全てにマッチ（フラグg）</span>
+
+<span class="cm">// test()：パターンにマッチするか true/false で返す</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">/hello/</span>.<span class="fn">test</span>(<span class="cs">"hello world"</span>)); <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">/hello/</span>.<span class="fn">test</span>(<span class="cs">"HELLO"</span>));       <span class="cm">// false</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cn">/hello/i</span>.<span class="fn">test</span>(<span class="cs">"HELLO"</span>));      <span class="cm">// true（iフラグで大文字無視）</span>
+
+<span class="cm">// match()：マッチした部分を配列で返す</span>
+<span class="kw">const</span> str = <span class="cs">"2026年3月13日"</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(str.<span class="fn">match</span>(<span class="cn">/\d+/g</span>));  <span class="cm">// ["2026", "3", "13"]</span>
+
+<span class="cm">// replace()：マッチした部分を置換</span>
+<span class="kw">const</span> text = <span class="cs">"  hello   world  "</span>;
+<span class="fn">console</span>.<span class="fn">log</span>(text.<span class="fn">replace</span>(<span class="cn">/\s+/g</span>, <span class="cs">" "</span>).<span class="fn">trim</span>()); <span class="cm">// "hello world"</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（よく使うパターン）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// \d  数字1文字　\D  数字以外</span>
+<span class="cm">// \w  英数字+_　 \W  それ以外</span>
+<span class="cm">// \s  空白文字   \S  空白以外</span>
+<span class="cm">// .   任意の1文字（改行以外）</span>
+<span class="cm">// ^   文字列の先頭　$  文字列の末尾</span>
+<span class="cm">// *   0回以上　+  1回以上　? 0か1回</span>
+<span class="cm">// {n} n回　{n,m} n〜m回</span>
+<span class="cm">// []  文字クラス（例：[a-z] 小文字英字）</span>
+
+<span class="cm">// 実践例</span>
+<span class="kw">const</span> emailReg = <span class="cn">/^[\w.-]+@[\w.-]+\.\w{2,}$/</span>;
+<span class="kw">const</span> telReg   = <span class="cn">/^\d{2,4}-\d{2,4}-\d{4}$/</span>;
+<span class="kw">const</span> zipReg   = <span class="cn">/^\d{3}-\d{4}$/</span>;
+
+<span class="fn">console</span>.<span class="fn">log</span>(emailReg.<span class="fn">test</span>(<span class="cs">"test@example.com"</span>)); <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(emailReg.<span class="fn">test</span>(<span class="cs">"not-an-email"</span>));       <span class="cm">// false</span>
+<span class="fn">console</span>.<span class="fn">log</span>(telReg.<span class="fn">test</span>(<span class="cs">"090-1234-5678"</span>));        <span class="cm">// true</span>
+<span class="fn">console</span>.<span class="fn">log</span>(zipReg.<span class="fn">test</span>(<span class="cs">"150-0001"</span>));             <span class="cm">// true</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">正規表現は最初から全部覚えようとしなくて大丈夫です。<strong>よく使う5パターン</strong>（メール・電話番号・郵便番号・数字のみ・英数字のみ）をコピーして使えるようにしておけば実務は十分こなせます。必要なときにMDNやregex101で調べる習慣をつけましょう。</div></div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>regex101.comは正規表現のデバッグに便利。実際に開いて生徒に使い方を紹介すると良い。「正規表現を暗記する必要はない、理解して検索できればOK」と伝えてハードルを下げる。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">フォームバリデーションに応用しよう</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「正規表現の最も実践的な使い方がフォームバリデーションです。メールアドレス・電話番号・パスワードの形式チェックを、入力のたびにリアルタイムで行うUIを作ります。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（リアルタイムバリデーション）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// バリデーションルールを定義</span>
+<span class="kw">const</span> rules = {
+  name:     { reg: <span class="cn">/^.{2,20}$/</span>,               msg: <span class="cs">"2〜20文字で入力してください"</span>      },
+  email:    { reg: <span class="cn">/^[\w.-]+@[\w.-]+\.\w{2,}$/</span>, msg: <span class="cs">"正しいメールアドレスを入力してください"</span>},
+  tel:      { reg: <span class="cn">/^\d{10,11}$/</span>,              msg: <span class="cs">"10〜11桁の数字で入力してください"</span>   },
+  password: { reg: <span class="cn">/^(?=.*[A-Z])(?=.*\d).{8,}$/</span>,
+                                                msg: <span class="cs">"大文字・数字を含む8文字以上"</span>         }
+};
+
+<span class="cm">// 各inputにバリデーションを適用</span>
+<span class="fn">Object</span>.<span class="fn">keys</span>(rules).<span class="fn">forEach</span>(fieldName => {
+  <span class="kw">const</span> input = document.<span class="fn">querySelector</span>(<span class="cs">`#</span><span class="cn">${{fieldName}}</span><span class="cs">`</span>);
+  <span class="kw">const</span> error = document.<span class="fn">querySelector</span>(<span class="cs">`#</span><span class="cn">${{fieldName}}</span><span class="cs">-error`</span>);
+  <span class="kw">if</span> (!input) <span class="kw">return</span>;
+
+  input.<span class="fn">addEventListener</span>(<span class="cs">"blur"</span>, () => {
+    <span class="kw">const</span> { reg, msg } = rules[fieldName];
+    <span class="kw">const</span> isValid = reg.<span class="fn">test</span>(input.value);
+    input.classList.<span class="fn">toggle</span>(<span class="cs">"error"</span>,   !isValid);
+    input.classList.<span class="fn">toggle</span>(<span class="cs">"success"</span>,  isValid);
+    <span class="kw">if</span> (error) error.textContent = isValid ? <span class="cs">""</span> : msg;
+  });
+});
+
+<span class="cm">// 送信前に全フィールドを一括チェック</span>
+<span class="kw">const</span> <span class="fn">validateAll</span> = () => {
+  <span class="kw">return</span> <span class="fn">Object</span>.<span class="fn">keys</span>(rules).<span class="fn">every</span>(fieldName => {
+    <span class="kw">const</span> input = document.<span class="fn">querySelector</span>(<span class="cs">`#</span><span class="cn">${{fieldName}}</span><span class="cs">`</span>);
+    <span class="kw">return</span> input ? rules[fieldName].reg.<span class="fn">test</span>(input.value) : <span class="ck">true</span>;
+  });
+};</span></div>
+</div>
+
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">文字列がパターンにマッチするか true/false で返すメソッドは？</div><div class="quiz-options"><div class="quiz-option wrong">match()</div><div class="quiz-option correct">test() ✅</div><div class="quiz-option wrong">search()</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">名前・メール・電話番号の3フィールドを持つフォームに、blurイベントでバリデーションを追加しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>パスワードフィールドを追加し「8文字以上・大文字含む・数字含む」の条件をリアルタイムで表示するUIを作ろう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>全フィールドが有効なときだけ送信ボタンを活性化するdisabledの制御を追加しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">正規表現リテラルの基本的な書き方が分かった</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">test()でバリデーション判定ができた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">\d・\w・^・$などの基本メタ文字が使えた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">フォームにリアルタイムバリデーションが実装できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第16回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

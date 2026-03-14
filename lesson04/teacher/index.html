@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第04回｜ループ処理を書こう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 04 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">JS基礎④</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">ループ処理を書こう<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">for・while・break・continue・for...of</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>for文・while文でループを書き、break/continueでループを制御し、for...ofで配列を処理できるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">ループ処理の概念を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">for文・while文を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">break・continue・配列ループを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">for文で繰り返し処理を書こう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「同じ処理を何度も繰り返すとき、同じコードを何行も書くのは非効率です。ループ（繰り返し）を使えば、5回でも100回でも1つのコードで実現できます。JavaScriptの繰り返しにはfor・while・forEach・forOfなど複数の方法があります。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（for文の基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// for（初期化; 条件; 更新）{ 処理 }</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">5</span>; i++) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`</span><span class="cn">${{i}}</span><span class="cs">回目`</span>);
+}
+<span class="cm">// → 0回目、1回目、2回目、3回目、4回目</span>
+
+<span class="cm">// 1〜10を合計する</span>
+<span class="kw">let</span> total = <span class="cn">0</span>;
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">1</span>; i <= <span class="cn">10</span>; i++) {
+  total += i;
+}
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`1〜10の合計：</span><span class="cn">${{total}}</span><span class="cs">`</span>); <span class="cm">// 55</span>
+
+<span class="cm">// 逆順ループ</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">5</span>; i >= <span class="cn">1</span>; i--) {
+  <span class="fn">console</span>.<span class="fn">log</span>(i); <span class="cm">// 5, 4, 3, 2, 1</span>
+}</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（while文）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// while（条件がtrueの間繰り返す）</span>
+<span class="kw">let</span> count = <span class="cn">0</span>;
+<span class="kw">while</span> (count < <span class="cn">5</span>) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`count: </span><span class="cn">${{count}}</span><span class="cs">`</span>);
+  count++; <span class="cm">// ← 忘れると無限ループ！</span>
+}
+
+<span class="cm">// do...while（必ず1回は実行される）</span>
+<span class="kw">let</span> num = <span class="cn">10</span>;
+<span class="kw">do</span> {
+  <span class="fn">console</span>.<span class="fn">log</span>(num); <span class="cm">// 条件に関係なく1回は実行される</span>
+  num++;
+} <span class="kw">while</span> (num < <span class="cn">5</span>); <span class="cm">// falseなので1回で終了</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">forとwhileの使い分け</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">繰り返す回数が分かるかどうかで決める</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><strong>for文</strong>：繰り返す回数がはっきり決まっているとき<br>例：配列の全要素を処理する、10回繰り返す<br><br><strong>while文</strong>：条件が満たされるまで繰り返すとき<br>例：ユーザーが正しい入力をするまで繰り返す<br><br>実務では<strong>for文が圧倒的に多く</strong>使われます。</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>while文で無限ループを意図的に作ってブラウザが固まる体験をさせると「条件の更新」の大切さが身に染みる（事前にconsole.logの件数を制限するよう伝えること）。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">break・continue・forOfを使おう</div>
+<div class="sec-time">25〜40分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「break・continueはループの流れを制御する命令です。breakはループを途中で抜け出し、continueは今回だけスキップして次の繰り返しへ進みます。また配列に対してはfor...ofを使うとよりシンプルに書けます。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（break・continue）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// break：ループを途中で終了する</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">10</span>; i++) {
+  <span class="kw">if</span> (i === <span class="cn">5</span>) <span class="kw">break</span>;         <span class="cm">// i が5になったら抜ける</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(i); <span class="cm">// 0, 1, 2, 3, 4</span>
+}
+
+<span class="cm">// continue：今回の繰り返しをスキップ</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < <span class="cn">10</span>; i++) {
+  <span class="kw">if</span> (i % <span class="cn">2</span> === <span class="cn">0</span>) <span class="kw">continue</span>;  <span class="cm">// 偶数はスキップ</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(i); <span class="cm">// 1, 3, 5, 7, 9（奇数だけ）</span>
+}</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（for...of で配列をループ）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> fruits = [<span class="cs">"りんご"</span>, <span class="cs">"バナナ"</span>, <span class="cs">"みかん"</span>, <span class="cs">"ぶどう"</span>];
+
+<span class="cm">// for文でインデックスを使う方法</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="cn">0</span>; i < fruits.length; i++) {
+  <span class="fn">console</span>.<span class="fn">log</span>(fruits[i]);
+}
+
+<span class="cm">// for...of：シンプルで読みやすい（配列の要素を順番に取り出す）</span>
+<span class="kw">for</span> (<span class="kw">const</span> fruit <span class="kw">of</span> fruits) {
+  <span class="fn">console</span>.<span class="fn">log</span>(fruit); <span class="cm">// りんご、バナナ、みかん、ぶどう</span>
+}
+
+<span class="cm">// インデックスも必要なら entries() を使う</span>
+<span class="kw">for</span> (<span class="kw">const</span> [i, fruit] <span class="kw">of</span> fruits.<span class="fn">entries</span>()) {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`</span><span class="cn">${{i + 1}}</span><span class="cs">番目：</span><span class="cn">${{fruit}}</span><span class="cs">`</span>);
+}</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">for...ofはES2015（ES6）から使える書き方です。配列を順番に処理するだけなら for...of が最もシンプルで読みやすいです。インデックスが必要な場合は <code>entries()</code> を組み合わせましょう。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">ループを途中で完全に終了する命令は？</div><div class="quiz-options"><div class="quiz-option wrong">continue</div><div class="quiz-option correct">break ✅</div><div class="quiz-option wrong">return</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">40〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">for文で1から100までの合計を計算してconsole.logで表示しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">好きな食べ物を5つ配列に入れて、for...ofでリスト表示しよう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>1から30までの数のうち、3の倍数は「Fizz」、5の倍数は「Buzz」、両方の倍数は「FizzBuzz」、それ以外は数字を表示するFizzBuzzを作ってみよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">for文の構造（初期化・条件・更新）が説明できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">while文が書けた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">breakとcontinueの違いが理解できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">for...ofで配列をループできた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第04回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

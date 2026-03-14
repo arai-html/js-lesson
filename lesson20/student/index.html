@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第20回｜フォームバリデーションを実装しよう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 20 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">フォーム</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(80,220,255,.15);color:#cef;">🧑‍💻 生徒用</span>
+</div>
+</div>
+<h1 style="color:#fff;">フォームバリデーションを実装しよう<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">novalidate・Constraint Validation API・文字数カウンター・パスワード強度</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>novalidateとConstraint Validation APIでカスタムバリデーションUIを実装し、文字数カウンター・パスワード強度チェックが作れるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">フォームバリデーションの設計を説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">HTML5バリデーション・JSによる独自バリデーションを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">リアルタイム入力補助・フォームの状態管理を実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">フォームバリデーションを実装しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">HTML5バリデーションとJS独自バリデーションを組み合わせて、ユーザーフレンドリーなフォームを作ります。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">index.html（HTML5バリデーション属性）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="ck">&lt;form</span> <span class="fn">id</span>=<span class="cs">"signup-form"</span> <span class="fn">novalidate</span><span class="ck">&gt;</span>
+  <span class="cm">&lt;!-- required：必須入力 --&gt;</span>
+  <span class="ck">&lt;input</span> <span class="fn">type</span>=<span class="cs">"text"</span>  <span class="fn">id</span>=<span class="cs">"name"</span>
+         <span class="fn">required</span> <span class="fn">minlength</span>=<span class="cs">"2"</span> <span class="fn">maxlength</span>=<span class="cs">"20"</span><span class="ck">&gt;</span>
+
+  <span class="cm">&lt;!-- type="email"：メール形式チェック --&gt;</span>
+  <span class="ck">&lt;input</span> <span class="fn">type</span>=<span class="cs">"email"</span> <span class="fn">id</span>=<span class="cs">"email"</span> <span class="fn">required</span><span class="ck">&gt;</span>
+
+  <span class="cm">&lt;!-- pattern：正規表現でチェック --&gt;</span>
+  <span class="ck">&lt;input</span> <span class="fn">type</span>=<span class="cs">"tel"</span>   <span class="fn">id</span>=<span class="cs">"tel"</span>
+         <span class="fn">pattern</span>=<span class="cs">"[0-9]{10,11}"</span><span class="ck">&gt;</span>
+
+  <span class="cm">&lt;!-- min/max：数値の範囲 --&gt;</span>
+  <span class="ck">&lt;input</span> <span class="fn">type</span>=<span class="cs">"number"</span> <span class="fn">id</span>=<span class="cs">"age"</span>
+         <span class="fn">min</span>=<span class="cs">"18"</span> <span class="fn">max</span>=<span class="cs">"100"</span><span class="ck">&gt;</span>
+
+  <span class="ck">&lt;button</span> <span class="fn">type</span>=<span class="cs">"submit"</span><span class="ck">&gt;</span>登録<span class="ck">&lt;/button&gt;</span>
+<span class="ck">&lt;/form&gt;</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（Constraint Validation API）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// novalidateでブラウザデフォルトのUIを無効化してJSで制御</span>
+<span class="kw">const</span> form = document.<span class="fn">querySelector</span>(<span class="cs">"#signup-form"</span>);
+
+<span class="kw">const</span> <span class="fn">showError</span> = (input, message) => {
+  input.classList.<span class="fn">add</span>(<span class="cs">"is-invalid"</span>);
+  input.classList.<span class="fn">remove</span>(<span class="cs">"is-valid"</span>);
+  <span class="kw">const</span> errEl = input.nextElementSibling;
+  <span class="kw">if</span> (errEl?.classList.<span class="fn">contains</span>(<span class="cs">"error-msg"</span>)) errEl.textContent = message;
+};
+
+<span class="kw">const</span> <span class="fn">showSuccess</span> = (input) => {
+  input.classList.<span class="fn">remove</span>(<span class="cs">"is-invalid"</span>);
+  input.classList.<span class="fn">add</span>(<span class="cs">"is-valid"</span>);
+  <span class="kw">const</span> errEl = input.nextElementSibling;
+  <span class="kw">if</span> (errEl?.classList.<span class="fn">contains</span>(<span class="cs">"error-msg"</span>)) errEl.textContent = <span class="cs">""</span>;
+};
+
+<span class="cm">// HTML5のConstraint Validation APIを使ってエラー内容を確認</span>
+<span class="kw">const</span> <span class="fn">validate</span> = (input) => {
+  <span class="kw">if</span> (input.validity.valueMissing) {
+    <span class="fn">showError</span>(input, <span class="cs">"必須項目です"</span>);
+  } <span class="kw">else if</span> (input.validity.tooShort) {
+    <span class="fn">showError</span>(input, <span class="cs">`最低</span><span class="cn">${{input.minLength}}</span><span class="cs">文字必要です`</span>);
+  } <span class="kw">else if</span> (input.validity.typeMismatch) {
+    <span class="fn">showError</span>(input, <span class="cs">"正しい形式で入力してください"</span>);
+  } <span class="kw">else if</span> (input.validity.patternMismatch) {
+    <span class="fn">showError</span>(input, <span class="cs">"形式が正しくありません"</span>);
+  } <span class="kw">else</span> {
+    <span class="fn">showSuccess</span>(input);
+  }
+};</span></div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">validity オブジェクトの主なプロパティ</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">HTML5バリデーションのエラー種別を判別できる</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><code>valueMissing</code>：required なのに空<br><code>tooShort/tooLong</code>：minlength/maxlength違反<br><code>typeMismatch</code>：type=emailなのにメール形式でない<br><code>patternMismatch</code>：pattern正規表現に不一致<br><code>rangeUnderflow/rangeOverflow</code>：min/max違反<br><code>valid</code>：全て問題なし（true/false）</div>
+</div>
+
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">リアルタイム入力補助・状態管理</div>
+<div class="sec-time">25〜45分</div>
+</div>
+
+<div class="callout info" style="border-color:#f0c400;"><div class="callout-icon">📖</div><div class="callout-body">文字数カウンター・パスワード強度・確認入力の一致チェックなど実用的なフォームUIを実装します。</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（文字数カウンター・パスワード強度）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// 文字数カウンター</span>
+<span class="kw">const</span> textarea = document.<span class="fn">querySelector</span>(<span class="cs">"#message"</span>);
+<span class="kw">const</span> counter  = document.<span class="fn">querySelector</span>(<span class="cs">"#char-count"</span>);
+<span class="kw">const</span> MAX = <span class="cn">200</span>;
+
+textarea.<span class="fn">addEventListener</span>(<span class="cs">"input"</span>, () => {
+  <span class="kw">const</span> len = textarea.value.length;
+  counter.textContent = <span class="cs">`</span><span class="cn">${{len}}</span><span class="cs"> / </span><span class="cn">${{MAX}}</span><span class="cs">`</span>;
+  counter.classList.<span class="fn">toggle</span>(<span class="cs">"over"</span>, len > MAX);
+});
+
+<span class="cm">// パスワード強度チェック</span>
+<span class="kw">const</span> <span class="fn">getStrength</span> = (pw) => {
+  <span class="kw">let</span> score = <span class="cn">0</span>;
+  <span class="kw">if</span> (pw.length >= <span class="cn">8</span>)             score++;
+  <span class="kw">if</span> (<span class="cn">/[A-Z]/</span>.<span class="fn">test</span>(pw))           score++;
+  <span class="kw">if</span> (<span class="cn">/[0-9]/</span>.<span class="fn">test</span>(pw))           score++;
+  <span class="kw">if</span> (<span class="cn">/[^A-Za-z0-9]/</span>.<span class="fn">test</span>(pw))   score++;
+  <span class="kw">return</span> [<span class="cs">"弱"</span>, <span class="cs">"普通"</span>, <span class="cs">"強"</span>, <span class="cs">"非常に強い"</span>][score - <span class="cn">1</span>] ?? <span class="cs">"非常に弱い"</span>;
+};
+
+<span class="kw">const</span> pwInput   = document.<span class="fn">querySelector</span>(<span class="cs">"#password"</span>);
+<span class="kw">const</span> strength  = document.<span class="fn">querySelector</span>(<span class="cs">"#strength"</span>);
+pwInput.<span class="fn">addEventListener</span>(<span class="cs">"input"</span>, () => {
+  strength.textContent = <span class="fn">getStrength</span>(pwInput.value);
+});
+
+<span class="cm">// パスワード確認の一致チェック</span>
+<span class="kw">const</span> pwConfirm = document.<span class="fn">querySelector</span>(<span class="cs">"#password-confirm"</span>);
+pwConfirm.<span class="fn">addEventListener</span>(<span class="cs">"input"</span>, () => {
+  <span class="kw">const</span> match = pwInput.value === pwConfirm.value;
+  pwConfirm.classList.<span class="fn">toggle</span>(<span class="cs">"is-valid"</span>,   match);
+  pwConfirm.classList.<span class="fn">toggle</span>(<span class="cs">"is-invalid"</span>, !match);
+});</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">送信ボタンのdisabled制御は「全フィールドが valid のときだけ有効にする」がベストプラクティスです。<code>form.checkValidity()</code>でフォーム全体のバリデーション結果をtrue/falseで取得できます。inputイベントのたびにこれを確認してボタンのdisabledを切り替えましょう。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">フォーム全体のバリデーション結果をtrue/falseで返すメソッドは？</div><div class="quiz-options"><div class="quiz-option" onclick="answer(this,false)">form.validate()</div><div class="quiz-option" onclick="answer(this,true)">form.checkValidity()</div><div class="quiz-option" onclick="answer(this,false)">form.isValid()</div></div>
+<div class="quiz-ans-msg correct">✅ 正解！よくできました！</div>
+<div class="quiz-ans-msg wrong">❌ もう一度考えてみよう。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">45〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">名前・メール・パスワード・パスワード確認の4フィールドを持つ登録フォームを作り、blurでバリデーションを実装しよう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;"><strong>アレンジ：</strong>パスワードフィールドに強度メーターを追加しよう（weak/medium/strongのクラスでCSSを切り替える）。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>全フィールドが有効なときだけ送信ボタンを活性化し、送信後に「登録完了！」メッセージを表示しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">novalidateとConstraint Validation APIでカスタムUIが作れた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">validity.valueMissingなどでエラー種別を判定できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">文字数カウンターが実装できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">パスワード確認の一致チェックが実装できた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第20回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+<script>
+function answer(el,ok){
+  var q=el.closest('.quiz');
+  q.querySelectorAll('.quiz-option').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='.5';});
+  el.style.opacity='1';el.classList.add(ok?'correct':'wrong');
+  q.querySelector('.quiz-ans-msg.'+(ok?'correct':'wrong')).style.display='block';
+}
+</script>
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>【講師用】第09回｜DOMを操作しよう②</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--js:#f7df1e;--js-dark:#1a1400;--js-accent:#f0c400;}
+/* コードブロック */
+.code-block{background:#1e1e1e;border-radius:12px;overflow:hidden;margin:18px 0 36px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.code-header{background:#2d2d2d;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #444;}
+.code-dots{display:flex;gap:5px;}.code-dots span{width:10px;height:10px;border-radius:50%;}
+.code-dots .r{background:#ff5f56;}.code-dots .y{background:#ffbd2e;}.code-dots .g{background:#27c93f;}
+.code-filename{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;flex:1;}
+.code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;color:#d4d4d4;white-space:pre;}
+/* シンタックスカラー（JS用） */
+.kw{color:#c586c0;}     /* const let function if */
+.fn{color:#dcdcaa;}     /* 関数名 */
+.cs{color:#ce9178;}     /* 文字列 */
+.cm{color:#6a9955;font-style:italic;}  /* コメント */
+.cn{color:#b5cea8;}     /* 数値 */
+.ck{color:#569cd6;}     /* true false null */
+/* コピーボタン */
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.copy-btn.copied{background:rgba(39,201,63,.25);border-color:#27c93f;color:#27c93f;}
+/* カード類 */
+.work-box{background:linear-gradient(135deg,#fffde6,#fff9cc);border:2px solid #f7df1e;border-radius:16px;padding:24px 28px;margin:24px 0;}
+.work-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#1a1400;margin-bottom:16px;}
+.work-step{background:#fff;border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;border:1px solid rgba(200,168,0,.2);}
+.work-num{background:#f7df1e;color:#1a1400;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.intro-box{background:linear-gradient(135deg,#fff9e6,#fff3cc);border-left:4px solid #f5a623;border-radius:0 12px 12px 0;padding:18px 22px;margin:18px 0;}
+.intro-icon{font-size:22px;margin-bottom:8px;}
+.point-card{background:#fffef0;border:1px solid rgba(200,168,0,.3);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.point-tag{display:inline-block;background:#f7df1e;color:#1a1400;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:8px;}
+.tip-box{background:#fffde6;border:1.5px solid #f0c400;border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;}
+.tip-icon{font-size:20px;}
+.quiz-ans-msg.correct,.quiz-ans-msg.wrong{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:700;}
+.quiz-ans-msg.correct{background:#e8fff0;color:#0a6b3a;}
+.quiz-ans-msg.wrong{background:#fff8e0;color:#7a5500;}
+</style>
+</head>
+<body>
+<div class="hero" style="background:linear-gradient(135deg,#1a1400 0%,#2a2000 55%,#3d3000 100%);">
+<div class="hero-inner">
+<div class="hero-top">
+<div class="hero-lesson-num" style="color:#f7df1e;background:rgba(247,223,30,.12);border-color:rgba(247,223,30,.3);">JavaScript LESSON 09 / 40</div>
+<div class="hero-tags">
+<span class="hero-tag ht-basic" style="background:rgba(247,223,30,.2);color:rgba(255,240,100,.9);">DOM②</span>
+<span class="hero-tag ht-time">⏱ 50分</span>
+<span class="hero-tag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(247,223,30,.25);color:#1a1400;">🎓 講師用</span>
+</div>
+</div>
+<h1 style="color:#fff;">DOMを操作しよう②<br><em style="color:rgba(247,223,30,.65);font-size:16px;font-weight:400;">addEventListener・イベントオブジェクト・preventDefault・イベントデリゲーション</em></h1>
+<div class="hero-goal"><span class="gi">🎯</span><span>addEventListenerでイベントを登録し、preventDefaultでデフォルト動作をキャンセルし、イベントデリゲーションが使えるようになる</span></div>
+</div>
+</div>
+<div class="wrap">
+<div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">📅 50分の流れ</div><div class="timeline"><div class="tl-item"><div class="tl-row"><div class="tl-time">0〜10分</div><div class="tl-label">イベントの種類と仕組みを説明</div><div class="tl-badge tb-talk">話す</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">10〜25分</div><div class="tl-label">addEventListener・イベントオブジェクトを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">25〜40分</div><div class="tl-label">イベントデリゲーション・フォームイベントを実践</div><div class="tl-badge tb-do">操作</div></div></div>
+<div class="tl-item"><div class="tl-row"><div class="tl-time">40〜50分</div><div class="tl-label">ワーク・クイズ・まとめ</div><div class="tl-badge tb-extra">まとめ</div></div></div>
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">1</div>
+<div class="sec-title">イベントを登録しよう</div>
+<div class="sec-time">0〜25分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「イベントとはユーザーの操作や状態の変化に対してJavaScriptが反応する仕組みです。クリック・キーボード入力・スクロール・マウス移動など様々なイベントがあります。addEventListenerでイベントを登録します。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（addEventListenerの基本）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="cs">"#btn"</span>);
+
+<span class="cm">// addEventListener(イベント名, 処理する関数)</span>
+btn.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, () => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"クリックされました！"</span>);
+});
+
+<span class="cm">// 関数を別に定義して渡す方法（再利用できる）</span>
+<span class="kw">const</span> <span class="fn">handleClick</span> = () => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"ハンドラー関数が実行された"</span>);
+};
+btn.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, handleClick);
+
+<span class="cm">// イベントの削除（不要になったら解除する）</span>
+btn.<span class="fn">removeEventListener</span>(<span class="cs">"click"</span>, handleClick);
+
+<span class="cm">// よく使うイベント一覧</span>
+<span class="cm">// click       クリック</span>
+<span class="cm">// dblclick    ダブルクリック</span>
+<span class="cm">// mouseenter  マウスが要素に入ったとき</span>
+<span class="cm">// mouseleave  マウスが要素から出たとき</span>
+<span class="cm">// keydown     キーを押したとき</span>
+<span class="cm">// keyup       キーを離したとき</span>
+<span class="cm">// input       入力のたびに発火</span>
+<span class="cm">// change      値が変わってフォーカスが外れたとき</span>
+<span class="cm">// submit      フォームが送信されたとき</span>
+<span class="cm">// scroll      スクロールしたとき</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（イベントオブジェクト）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// イベント処理の関数はイベントオブジェクト(e)を受け取れる</span>
+<span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="cs">"#btn"</span>);
+
+btn.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, (e) => {
+  <span class="fn">console</span>.<span class="fn">log</span>(e.type);          <span class="cm">// "click"（イベントの種類）</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(e.target);        <span class="cm">// クリックされた要素</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(e.target.id);     <span class="cm">// 要素のid</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(e.clientX, e.clientY); <span class="cm">// クリック位置（座標）</span>
+});
+
+<span class="cm">// フォームの送信をキャンセルする（最重要！）</span>
+<span class="kw">const</span> form = document.<span class="fn">querySelector</span>(<span class="cs">"form"</span>);
+form.<span class="fn">addEventListener</span>(<span class="cs">"submit"</span>, (e) => {
+  e.<span class="fn">preventDefault</span>(); <span class="cm">// ページリロードをキャンセル</span>
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"フォームが送信されました"</span>);
+});</div>
+</div>
+
+<div class="point-card">
+<div class="point-tag">preventDefault()は必須</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:6px;">フォームとリンクで特に重要</div>
+<div style="font-size:13.5px;line-height:1.8;color:#555;"><code>e.preventDefault()</code>を呼ぶと、ブラウザのデフォルト動作をキャンセルできます。<br><br>• <strong>form の submit</strong>：ページがリロードされるのを防ぐ<br>• <strong>a タグのクリック</strong>：ページ遷移を防ぐ（スムーズスクロールなどに使う）<br><br>これを忘れるとフォームを送信するたびにページがリロードされます。</div>
+</div>
+<div class="callout tip"><div class="callout-icon">👆</div><div class="callout-body"><strong>講師メモ</strong>preventDefault()を忘れたときの挙動を実際に見せる。「あ、これかー」と体験させると記憶に定着する。</div></div>
+<div class="quiz"><div class="quiz-header"><div class="quiz-icon">❓</div><div class="quiz-title">確認クイズ</div></div>
+<div class="quiz-q">ブラウザのデフォルト動作（フォーム送信時のリロードなど）をキャンセルするメソッドは？</div><div class="quiz-options"><div class="quiz-option wrong">e.stopPropagation()</div><div class="quiz-option correct">e.preventDefault() ✅</div><div class="quiz-option wrong">e.cancel()</div></div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">2</div>
+<div class="sec-title">イベントデリゲーション・フォームイベント</div>
+<div class="sec-time">25〜40分</div>
+</div>
+
+<div class="callout info"><div class="callout-icon">💬</div><div class="callout-body"><strong>講師がこう話す</strong>「イベントデリゲーションは、子要素にイベントを登録する代わりに親要素に登録して、どの子要素がクリックされたかをe.targetで判断する技術です。動的に追加した要素にも自動でイベントが効くので実務で必須のテクニックです。」</div></div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（イベントデリゲーション）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="cm">// ❌ 個々の要素にイベントを登録（後から追加した要素には効かない）</span>
+document.<span class="fn">querySelectorAll</span>(<span class="cs">".item"</span>).<span class="fn">forEach</span>(item => {
+  item.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, () => <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">"クリック"</span>));
+});
+
+<span class="cm">// ✅ 親要素にイベントを登録（動的追加後も有効）</span>
+<span class="kw">const</span> list = document.<span class="fn">querySelector</span>(<span class="cs">"#list"</span>);
+list.<span class="fn">addEventListener</span>(<span class="cs">"click"</span>, (e) => {
+
+  <span class="cm">// クリックされたのが .item のときだけ処理</span>
+  <span class="kw">if</span> (e.target.classList.<span class="fn">contains</span>(<span class="cs">"item"</span>)) {
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="cs">`</span><span class="cn">${{e.target.textContent}}</span><span class="cs">がクリックされた`</span>);
+    e.target.classList.<span class="fn">toggle</span>(<span class="cs">"selected"</span>);
+  }
+
+});</span></div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><div class="code-filename">script.js（フォームイベント）</div><button class="copy-btn">📋 コピー</button></div>
+<div class="code-body"><span class="kw">const</span> input = document.<span class="fn">querySelector</span>(<span class="cs">"#name-input"</span>);
+<span class="kw">const</span> preview = document.<span class="fn">querySelector</span>(<span class="cs">"#preview"</span>);
+
+<span class="cm">// input：入力するたびに発火（リアルタイム）</span>
+input.<span class="fn">addEventListener</span>(<span class="cs">"input"</span>, (e) => {
+  preview.textContent = e.target.value;
+});
+
+<span class="cm">// focus：フォーカスが当たったとき</span>
+input.<span class="fn">addEventListener</span>(<span class="cs">"focus"</span>, () => {
+  input.style.borderColor = <span class="cs">"#f7df1e"</span>;
+});
+
+<span class="cm">// blur：フォーカスが外れたとき（バリデーションに使う）</span>
+input.<span class="fn">addEventListener</span>(<span class="cs">"blur"</span>, () => {
+  input.style.borderColor = <span class="cs">""</span>;
+  <span class="kw">if</span> (input.value.<span class="fn">trim</span>() === <span class="cs">""</span>) {
+    input.classList.<span class="fn">add</span>(<span class="cs">"error"</span>);
+  } <span class="kw">else</span> {
+    input.classList.<span class="fn">remove</span>(<span class="cs">"error"</span>);
+  }
+});</span></div>
+</div>
+
+<div class="tip-box"><div class="tip-icon">💡</div><div style="font-size:13.5px;line-height:1.8;">inputイベントはchangeイベントと違い、<strong>入力のたびにリアルタイムで発火</strong>します。文字数カウンター・リアルタイム検索・プレビュー表示など、入力に即座に反応するUIを作るときに使います。</div></div>
+
+</div><div class="section">
+<div class="sec-header">
+<div class="sec-num" style="background:#f7df1e;color:#1a1400;">✏️</div>
+<div class="sec-title">ワーク</div>
+<div class="sec-time">40〜50分</div>
+</div>
+<div class="work-box">
+<div class="work-title">✏️ ワーク（15分）</div>
+<div class="work-step"><div class="work-num">1</div><div style="font-size:14px;line-height:1.7;">テキスト入力欄に文字を入力するたびにh1にリアルタイムで反映されるUIを作ろう。</div></div><div class="work-step"><div class="work-num">2</div><div style="font-size:14px;line-height:1.7;">リストにクリックイベントを登録し、クリックした項目の背景色が変わるUIをイベントデリゲーションで作ろう。</div></div><div class="work-step"><div class="work-num">3</div><div style="font-size:14px;line-height:1.7;"><strong>チャレンジ：</strong>フォームのsubmitイベントをpreventDefaultでキャンセルし、入力値をバリデーションして問題なければ送信完了メッセージを表示しよう。</div></div>
+</div>
+</div><div class="checklist"><div class="checklist-title">📋 今日のチェックリスト</div><div class="check-item"><div class="check-box"></div><div class="check-text">addEventListenerでクリックイベントを登録できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">e.preventDefaultでフォームの送信をキャンセルできた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">イベントデリゲーションの仕組みが理解できた</div></div><div class="check-item"><div class="check-box"></div><div class="check-text">inputイベントでリアルタイムプレビューが作れた</div></div></div>
+<div style="height:40px;"></div>
+<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;border-top:1px solid var(--border);">
+第09回 / 全40回　｜　JavaScript デザイナーコース　©2026
+</div>
+</div>
+<script>document.querySelectorAll('.check-box').forEach(b=>b.addEventListener('click',function(){this.classList.toggle('checked');}));</script>
+
+
+<script>
+document.querySelectorAll('.code-block').forEach(function(block){
+  var btn = block.querySelector('.copy-btn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var text = block.querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✅ コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    }).catch(function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      btn.textContent = '✅ コピー済み'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 コピー'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>
